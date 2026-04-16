@@ -29,7 +29,7 @@ export function ExportButton({ prompts, filename = 'prompts.txt' }: Props) {
       type="button"
       onClick={handleClick}
       disabled={prompts.length === 0}
-      className="rounded border px-4 py-2 hover:bg-gray-50 disabled:opacity-50"
+      className="rounded border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-50"
     >
       下載 prompts.txt
     </button>

@@ -133,30 +133,30 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900">
+    <div className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
       <div className="mx-auto max-w-5xl space-y-6">
-        <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <header className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
             Prompt Tool
           </p>
-          <h1 className="mt-2 text-3xl font-bold">AI 虛擬網紅提示詞產生器</h1>
-          <p className="mt-2 text-sm text-slate-600">
+          <h1 className="mt-2 text-3xl font-bold text-slate-100">AI 虛擬網紅提示詞產生器</h1>
+          <p className="mt-2 text-sm text-slate-400">
             角色：{character.display_name}（{character.character_id}）
           </p>
         </header>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">工單</h2>
-              <p className="text-sm text-slate-500">
+              <h2 className="text-lg font-semibold text-slate-100">工單</h2>
+              <p className="text-sm text-slate-400">
                 新增一筆或多筆工單，再推薦相容的構圖。
               </p>
             </div>
             <button
               type="button"
               onClick={handleAddBlankOrder}
-              className="rounded border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50"
+              className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700"
             >
               + 新增工單
             </button>
@@ -164,19 +164,19 @@ export default function App() {
 
           <div className="mt-6 space-y-4">
             {orders.length === 0 && (
-              <div className="rounded border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
+              <div className="rounded border border-dashed border-slate-700 bg-slate-800/50 p-4 text-sm text-slate-400">
                 尚無工單，新增一筆開始組裝提示詞。
               </div>
             )}
 
             {orders.map((order, index) => (
-              <div key={order.id} className="relative rounded-xl border border-slate-200 p-4">
-                <div className="mb-2 text-sm text-slate-500">工單 {index + 1}</div>
+              <div key={order.id} className="relative rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                <div className="mb-2 text-sm text-slate-400">工單 {index + 1}</div>
                 <OrderInput value={order} onOrderChange={(patch) => updateOrder(order.id, patch)} />
                 <button
                   type="button"
                   onClick={() => removeOrder(order.id)}
-                  className="absolute right-4 top-4 text-sm text-red-600 hover:text-red-700"
+                  className="absolute right-4 top-4 text-sm text-red-400 hover:text-red-300"
                 >
                   移除
                 </button>
@@ -189,13 +189,13 @@ export default function App() {
               type="button"
               onClick={handleRecommend}
               disabled={orders.length === 0}
-              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
             >
               推薦構圖
             </button>
 
             {globalError && (
-              <div role="alert" className="text-sm text-red-600">
+              <div role="alert" className="text-sm text-red-400">
                 {globalError}
               </div>
             )}
@@ -203,18 +203,18 @@ export default function App() {
         </section>
 
         {Object.keys(compSelections).length > 0 && (
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">構圖挑選</h2>
-                <p className="text-sm text-slate-500">
+                <h2 className="text-lg font-semibold text-slate-100">構圖挑選</h2>
+                <p className="text-sm text-slate-400">
                   取消勾選不想組裝的構圖。
                 </p>
               </div>
               <button
                 type="button"
                 onClick={handleAssemble}
-                className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
+                className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
               >
                 組裝提示詞
               </button>
@@ -233,7 +233,7 @@ export default function App() {
 
                 return (
                   <div key={order.id} className="space-y-3">
-                    <h3 className="text-sm font-semibold text-slate-700">工單 {index + 1}</h3>
+                    <h3 className="text-sm font-semibold text-slate-300">工單 {index + 1}</h3>
                     <CompPicker
                       recommended={recommended}
                       selected={selection.selectedCompCodes}
@@ -247,11 +247,11 @@ export default function App() {
         )}
 
         {assembledPrompts.length > 0 && (
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">提示詞輸出</h2>
-                <p className="text-sm text-slate-500">
+                <h2 className="text-lg font-semibold text-slate-100">提示詞輸出</h2>
+                <p className="text-sm text-slate-400">
                   可逐筆複製，或匯出為單一文字檔。
                 </p>
               </div>

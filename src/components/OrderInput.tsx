@@ -49,19 +49,19 @@ export function OrderInput({ value, onOrderChange }: Props) {
   }
 
   return (
-    <div className="space-y-3 rounded border p-3">
+    <div className="space-y-3 rounded border border-slate-700 bg-slate-900 p-3">
       <div className="flex gap-2">
         <button
           type="button"
           onClick={() => setMode('text')}
-          className={`rounded px-3 py-1 ${mode === 'text' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          className={`rounded px-3 py-1 text-sm ${mode === 'text' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
         >
           文字
         </button>
         <button
           type="button"
           onClick={() => setMode('form')}
-          className={`rounded px-3 py-1 ${mode === 'form' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          className={`rounded px-3 py-1 text-sm ${mode === 'form' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
         >
           表單
         </button>
@@ -69,7 +69,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
 
       {mode === 'text' && (
         <div>
-          <label htmlFor="order-text" className="block text-sm font-medium">
+          <label htmlFor="order-text" className="block text-sm font-medium text-slate-200">
             工單文字
           </label>
           <textarea
@@ -78,11 +78,11 @@ export function OrderInput({ value, onOrderChange }: Props) {
             onChange={(e) => setTextValue(e.target.value)}
             onBlur={handleTextBlur}
             placeholder="CAS-02_SCN-01_POS-04_EXP-01 T0 x4"
-            className="w-full rounded border p-2 font-mono"
+            className="mt-1 w-full rounded border border-slate-700 bg-slate-800 p-2 font-mono text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
             rows={2}
           />
           {error && (
-            <div role="alert" className="mt-1 text-sm text-red-500">
+            <div role="alert" className="mt-1 text-sm text-red-400">
               {error}
             </div>
           )}
@@ -127,7 +127,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
             onChange={(v) => handleFormChange({ tier: v as Tier })}
           />
           <div>
-            <label htmlFor="count" className="block text-sm font-medium">
+            <label htmlFor="count" className="block text-sm font-medium text-slate-200">
               數量
             </label>
             <input
@@ -136,7 +136,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
               min={1}
               value={value?.count ?? 1}
               onChange={(e) => handleFormChange({ count: Number(e.target.value) })}
-              className="w-full rounded border p-2"
+              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 p-2 text-slate-100 focus:border-blue-500 focus:outline-none"
             />
           </div>
         </div>
@@ -156,17 +156,17 @@ interface SelectFieldProps {
 function SelectField({ id, label, value, options, onChange }: SelectFieldProps) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium">
+      <label htmlFor={id} className="block text-sm font-medium text-slate-200">
         {label}
       </label>
       <select
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded border p-2"
+        className="mt-1 w-full rounded border border-slate-700 bg-slate-800 p-2 text-slate-100 focus:border-blue-500 focus:outline-none"
       >
         {options.map((o) => (
-          <option key={o.code} value={o.code}>
+          <option key={o.code} value={o.code} className="bg-slate-800 text-slate-100">
             {o.code} - {o.name}
           </option>
         ))}
