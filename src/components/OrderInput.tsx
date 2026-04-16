@@ -56,21 +56,21 @@ export function OrderInput({ value, onOrderChange }: Props) {
           onClick={() => setMode('text')}
           className={`rounded px-3 py-1 ${mode === 'text' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
         >
-          Text
+          文字
         </button>
         <button
           type="button"
           onClick={() => setMode('form')}
           className={`rounded px-3 py-1 ${mode === 'form' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
         >
-          Form
+          表單
         </button>
       </div>
 
       {mode === 'text' && (
         <div>
           <label htmlFor="order-text" className="block text-sm font-medium">
-            Order text
+            工單文字
           </label>
           <textarea
             id="order-text"
@@ -93,42 +93,42 @@ export function OrderInput({ value, onOrderChange }: Props) {
         <div className="grid grid-cols-2 gap-3">
           <SelectField
             id="outfit"
-            label="Outfit"
+            label="服裝"
             value={value?.outfit ?? outfits[0].code}
             options={outfits.map((o) => ({ code: o.code, name: o.name }))}
             onChange={(v) => handleFormChange({ outfit: v })}
           />
           <SelectField
             id="scene"
-            label="Scene"
+            label="場景"
             value={value?.scene ?? scenes[0].code}
             options={scenes.map((o) => ({ code: o.code, name: o.name }))}
             onChange={(v) => handleFormChange({ scene: v })}
           />
           <SelectField
             id="pose"
-            label="Pose"
+            label="姿勢"
             value={value?.pose ?? poses[0].code}
             options={poses.map((o) => ({ code: o.code, name: o.name }))}
             onChange={(v) => handleFormChange({ pose: v })}
           />
           <SelectField
             id="expression"
-            label="Expression"
+            label="表情"
             value={value?.expr ?? expressions[0].code}
             options={expressions.map((o) => ({ code: o.code, name: o.name }))}
             onChange={(v) => handleFormChange({ expr: v })}
           />
           <SelectField
             id="tier"
-            label="Tier"
+            label="分級"
             value={value?.tier ?? 'T0'}
             options={TIERS.map((t) => ({ code: t, name: t }))}
             onChange={(v) => handleFormChange({ tier: v as Tier })}
           />
           <div>
             <label htmlFor="count" className="block text-sm font-medium">
-              Count
+              數量
             </label>
             <input
               id="count"

@@ -139,18 +139,18 @@ export default function App() {
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
             Prompt Tool
           </p>
-          <h1 className="mt-2 text-3xl font-bold">AI Virtual Influencer Prompt Builder</h1>
+          <h1 className="mt-2 text-3xl font-bold">AI 虛擬網紅提示詞產生器</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Character: {character.display_name} ({character.character_id})
+            角色：{character.display_name}（{character.character_id}）
           </p>
         </header>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Orders</h2>
+              <h2 className="text-lg font-semibold">工單</h2>
               <p className="text-sm text-slate-500">
-                Add one or more orders, then recommend compatible compositions.
+                新增一筆或多筆工單，再推薦相容的構圖。
               </p>
             </div>
             <button
@@ -158,27 +158,27 @@ export default function App() {
               onClick={handleAddBlankOrder}
               className="rounded border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50"
             >
-              + Add Order
+              + 新增工單
             </button>
           </div>
 
           <div className="mt-6 space-y-4">
             {orders.length === 0 && (
               <div className="rounded border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
-                No orders yet. Add one to start building prompts.
+                尚無工單，新增一筆開始組裝提示詞。
               </div>
             )}
 
             {orders.map((order, index) => (
               <div key={order.id} className="relative rounded-xl border border-slate-200 p-4">
-                <div className="mb-2 text-sm text-slate-500">Order {index + 1}</div>
+                <div className="mb-2 text-sm text-slate-500">工單 {index + 1}</div>
                 <OrderInput value={order} onOrderChange={(patch) => updateOrder(order.id, patch)} />
                 <button
                   type="button"
                   onClick={() => removeOrder(order.id)}
                   className="absolute right-4 top-4 text-sm text-red-600 hover:text-red-700"
                 >
-                  Remove
+                  移除
                 </button>
               </div>
             ))}
@@ -191,7 +191,7 @@ export default function App() {
               disabled={orders.length === 0}
               className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
-              Recommend COMPs
+              推薦構圖
             </button>
 
             {globalError && (
@@ -206,9 +206,9 @@ export default function App() {
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Composition Picker</h2>
+                <h2 className="text-lg font-semibold">構圖挑選</h2>
                 <p className="text-sm text-slate-500">
-                  Uncheck any recommended compositions you do not want to assemble.
+                  取消勾選不想組裝的構圖。
                 </p>
               </div>
               <button
@@ -216,7 +216,7 @@ export default function App() {
                 onClick={handleAssemble}
                 className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
               >
-                Assemble Prompts
+                組裝提示詞
               </button>
             </div>
 
@@ -233,7 +233,7 @@ export default function App() {
 
                 return (
                   <div key={order.id} className="space-y-3">
-                    <h3 className="text-sm font-semibold text-slate-700">Order {index + 1}</h3>
+                    <h3 className="text-sm font-semibold text-slate-700">工單 {index + 1}</h3>
                     <CompPicker
                       recommended={recommended}
                       selected={selection.selectedCompCodes}
@@ -250,9 +250,9 @@ export default function App() {
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Prompt Output</h2>
+                <h2 className="text-lg font-semibold">提示詞輸出</h2>
                 <p className="text-sm text-slate-500">
-                  Copy individual prompts or export them as a single text file.
+                  可逐筆複製，或匯出為單一文字檔。
                 </p>
               </div>
               <ExportButton prompts={assembledPrompts} />

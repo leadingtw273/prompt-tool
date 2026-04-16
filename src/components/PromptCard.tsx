@@ -9,6 +9,12 @@ interface Props {
   prompt: string;
 }
 
+const STATUS_LABEL: Record<'too_short' | 'ok' | 'too_long', string> = {
+  too_short: '太短',
+  ok: '合適',
+  too_long: '太長',
+};
+
 export function PromptCard({ orderCode, tier, count, prompt }: Props) {
   const [copied, setCopied] = useState(false);
   const wordCount = countWords(prompt);
@@ -26,7 +32,7 @@ export function PromptCard({ orderCode, tier, count, prompt }: Props) {
         <div>
           <div className="font-mono text-sm">{orderCode}</div>
           <div className="text-xs text-gray-500">
-            {tier} · plan {count} images (seed variants handled by ComfyUI)
+            {tier} · 預計 {count} 張（seed 變體由 ComfyUI 處理）
           </div>
         </div>
         <span
@@ -39,7 +45,7 @@ export function PromptCard({ orderCode, tier, count, prompt }: Props) {
                 : 'rounded bg-red-100 px-2 py-1 text-xs text-red-700'
           }
         >
-          {wordCount} words · {status}
+          {wordCount} 字 · {STATUS_LABEL[status]}
         </span>
       </div>
 
@@ -50,7 +56,7 @@ export function PromptCard({ orderCode, tier, count, prompt }: Props) {
         onClick={handleCopy}
         className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
       >
-        {copied ? 'Copied' : 'Copy'}
+        {copied ? '已複製' : '複製'}
       </button>
     </div>
   );

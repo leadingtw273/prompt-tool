@@ -25,7 +25,7 @@ describe('PromptCard', () => {
         );
         expect(screen.getByText(/CAS-02_SCN-01_POS-04_EXP-01_COMP-03/)).toBeInTheDocument();
         const badge = screen.getByTestId('length-status');
-        expect(badge.textContent).toMatch(/too_short|ok|too_long/);
+        expect(badge.textContent).toMatch(/太短|合適|太長/);
       });
     });
 
@@ -41,7 +41,7 @@ describe('PromptCard', () => {
             prompt={samplePrompt}
           />,
         );
-        await user.click(screen.getByRole('button', { name: /copy/i }));
+        await user.click(screen.getByRole('button', { name: '複製' }));
         await waitFor(() => {
           expect(writeTextSpy).toHaveBeenCalledWith(samplePrompt);
         });

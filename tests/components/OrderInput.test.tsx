@@ -12,7 +12,7 @@ describe('OrderInput', () => {
         const onOrderChange = vi.fn();
         render(<OrderInput value={null} onOrderChange={onOrderChange} />);
 
-        const textarea = screen.getByLabelText(/order text/i);
+        const textarea = screen.getByLabelText('工單文字');
         await user.type(textarea, 'CAS-02_SCN-01_POS-04_EXP-01 T0 x4');
         await user.tab();
 
@@ -27,7 +27,7 @@ describe('OrderInput', () => {
       it('Then an error message is displayed', async () => {
         const user = userEvent.setup();
         render(<OrderInput value={null} onOrderChange={vi.fn()} />);
-        const textarea = screen.getByLabelText(/order text/i);
+        const textarea = screen.getByLabelText('工單文字');
         await user.type(textarea, 'invalid-format');
         await user.tab();
         expect(screen.getByRole('alert')).toBeInTheDocument();
@@ -40,14 +40,14 @@ describe('OrderInput', () => {
       it('Then five select inputs and a count input are rendered', async () => {
         const user = userEvent.setup();
         render(<OrderInput value={null} onOrderChange={vi.fn()} />);
-        const formBtn = screen.getByRole('button', { name: /form/i });
+        const formBtn = screen.getByRole('button', { name: '表單' });
         await user.click(formBtn);
-        expect(screen.getByLabelText(/outfit/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/scene/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/pose/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/expression/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/tier/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/count/i)).toBeInTheDocument();
+        expect(screen.getByLabelText('服裝')).toBeInTheDocument();
+        expect(screen.getByLabelText('場景')).toBeInTheDocument();
+        expect(screen.getByLabelText('姿勢')).toBeInTheDocument();
+        expect(screen.getByLabelText('表情')).toBeInTheDocument();
+        expect(screen.getByLabelText('分級')).toBeInTheDocument();
+        expect(screen.getByLabelText('數量')).toBeInTheDocument();
       });
     });
   });
