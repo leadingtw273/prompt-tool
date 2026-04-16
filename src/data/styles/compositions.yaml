@@ -1,0 +1,50 @@
+- code: COMP-01
+  name: 特寫正面
+  prompt: "close-up headshot, front view, eye-level, direct gaze at camera"
+  shot: close_up
+  angle: front
+- code: COMP-02
+  name: 特寫 45 度
+  prompt: "close-up headshot, 45° angle, slightly looking up at camera"
+  shot: close_up
+  angle: 45deg
+- code: COMP-03
+  name: 半身正面置中
+  prompt: "medium shot, front view, centered, direct gaze"
+  shot: medium
+  angle: front
+- code: COMP-04
+  name: 全身 3/4 角度
+  prompt: "full-body shot, 3/4 angle, subject slightly off-center"
+  shot: full_body
+  angle: three_quarter
+- code: COMP-05
+  name: 七分身側目
+  prompt: "three-quarter body shot, 45° angle, looking slightly to the side"
+  shot: three_quarter_body
+  angle: 45deg
+- code: COMP-06
+  name: 全身低視角
+  prompt: "full-body shot, low angle looking up, 3/4 angle"
+  shot: full_body
+  angle: low_up
+- code: COMP-07
+  name: 半身高視角
+  prompt: "medium shot, high angle looking down, centered"
+  shot: medium
+  angle: high_down
+- code: COMP-08
+  name: 背影過肩
+  prompt: "over-the-shoulder view, back facing camera, face partially turned to camera"
+  shot: medium
+  angle: over_shoulder
+- code: COMP-09
+  name: 極近特寫
+  prompt: "extreme close-up, front view, face and shoulders only"
+  shot: extreme_close_up
+  angle: front
+- code: COMP-10
+  name: 側面半臉
+  prompt: "left-side half-face view, profile, eye-level"
+  shot: medium
+  angle: profile

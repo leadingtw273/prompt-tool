@@ -1,0 +1,40 @@
+- code: SCN-01
+  name: 咖啡廳室內
+  prompt: "cozy cafe interior, wooden table, latte on the table"
+  lighting_hint: "warm side lighting"
+- code: SCN-03
+  name: 公園草地
+  prompt: "park bench, green grass, trees, dappled sunlight"
+  lighting_hint: "dappled natural light"
+- code: SCN-04
+  name: 街頭街拍
+  prompt: "urban street, crosswalk, city vibe"
+  lighting_hint: "natural daylight"
+- code: SCN-05
+  name: 書店圖書館
+  prompt: "bookstore shelves, library, quiet atmosphere"
+  lighting_hint: "soft indoor lighting"
+- code: SCN-06
+  name: 健身房
+  prompt: "gym interior, equipment, mirror wall"
+  lighting_hint: "bright even lighting"
+- code: SCN-07
+  name: 臥室
+  prompt: "bedroom, soft bedding, window light, cozy atmosphere"
+  lighting_hint: "natural window light"
+- code: SCN-09
+  name: 泳池海邊
+  prompt: "swimming pool, ocean beach, clear water, blue sky"
+  lighting_hint: "bright sunlight"
+- code: SCN-11
+  name: 美術館白牆
+  prompt: "white wall gallery, minimalist, art frames"
+  lighting_hint: "soft even light"
+- code: SCN-14
+  name: 花店植物
+  prompt: "flower shop, green plants, botanical, natural"
+  lighting_hint: "soft natural light"
+- code: SCN-17
+  name: 屋頂天台
+  prompt: "rooftop, city skyline, sunset view"
+  lighting_hint: "golden hour side lighting"
