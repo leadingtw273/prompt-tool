@@ -1,121 +1,284 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import { CompPicker } from '@/components/CompPicker';
+import { ExportButton } from '@/components/ExportButton';
+import { OrderInput } from '@/components/OrderInput';
+import { PromptCard } from '@/components/PromptCard';
+import { isCompCompatible, isOrderForbidden } from '@/lib/compatibility';
+import { recommendComps } from '@/lib/compRecommender';
+import {
+  loadCharacter,
+  loadCompositions,
+  loadCompCompatibility,
+  loadExpressions,
+  loadForbiddenCombinations,
+  loadOutfits,
+  loadPoses,
+  loadScenes,
+  loadTierConstraints,
+} from '@/lib/dataLoader';
+import { assemblePrompt } from '@/lib/promptAssembler';
+import { countWords } from '@/lib/tokenCount';
+import { useOrderStore } from '@/store/useOrderStore';
+import type { AssembledPrompt } from '@/types';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const orders = useOrderStore((state) => state.orders);
+  const compSelections = useOrderStore((state) => state.compSelections);
+  const assembledPrompts = useOrderStore((state) => state.assembledPrompts);
+  const addOrder = useOrderStore((state) => state.addOrder);
+  const updateOrder = useOrderStore((state) => state.updateOrder);
+  const removeOrder = useOrderStore((state) => state.removeOrder);
+  const setCompSelection = useOrderStore((state) => state.setCompSelection);
+  const toggleComp = useOrderStore((state) => state.toggleComp);
+  const setAssembledPrompts = useOrderStore((state) => state.setAssembledPrompts);
+
+  const [globalError, setGlobalError] = useState<string | null>(null);
+
+  const character = loadCharacter('ACC-001');
+  const outfits = loadOutfits();
+  const scenes = loadScenes();
+  const poses = loadPoses();
+  const expressions = loadExpressions();
+  const compositions = loadCompositions();
+  const tierConstraints = loadTierConstraints();
+  const compCompatibility = loadCompCompatibility();
+  const forbiddenCombinations = loadForbiddenCombinations();
+
+  function handleAddBlankOrder() {
+    addOrder({
+      outfit: outfits[0].code,
+      scene: scenes[0].code,
+      pose: poses[0].code,
+      expr: expressions[0].code,
+      tier: 'T0',
+      count: 1,
+    });
+  }
+
+  function handleRecommend() {
+    setGlobalError(null);
+    setAssembledPrompts([]);
+
+    for (const order of orders) {
+      const forbidden = isOrderForbidden(order, forbiddenCombinations);
+      if (forbidden.forbidden) {
+        setGlobalError(`Order ${order.id}: ${forbidden.reason}`);
+        return;
+      }
+
+      const compatiblePool = compositions.filter((composition) =>
+        isCompCompatible(
+          composition,
+          {
+            pose: order.pose,
+            outfit: order.outfit,
+            scene: order.scene,
+          },
+          compCompatibility,
+        ),
+      );
+
+      const recommended = recommendComps({ pool: compatiblePool, n: 5 });
+
+      setCompSelection(order.id, {
+        recommendedCompCodes: recommended.map((composition) => composition.code),
+        selectedCompCodes: recommended.map((composition) => composition.code),
+      });
+    }
+  }
+
+  function handleAssemble() {
+    setGlobalError(null);
+
+    const prompts: AssembledPrompt[] = [];
+
+    for (const order of orders) {
+      const selection = compSelections[order.id];
+      if (!selection) {
+        continue;
+      }
+
+      for (const compCode of selection.selectedCompCodes) {
+        const composition = compositions.find((item) => item.code === compCode);
+        const outfit = outfits.find((item) => item.code === order.outfit);
+        const scene = scenes.find((item) => item.code === order.scene);
+        const pose = poses.find((item) => item.code === order.pose);
+        const expression = expressions.find((item) => item.code === order.expr);
+
+        if (!composition || !outfit || !scene || !pose || !expression) {
+          continue;
+        }
+
+        const prompt = assemblePrompt({
+          order,
+          comp: composition,
+          character,
+          outfit,
+          scene,
+          pose,
+          expression,
+          tierConstraints,
+        });
+
+        prompts.push({
+          orderId: order.id,
+          compCode,
+          prompt,
+          estimatedWords: countWords(prompt),
+        });
+      }
+    }
+
+    setAssembledPrompts(prompts);
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+    <div className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <header className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
+            Prompt Tool
           </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+          <h1 className="mt-2 text-3xl font-bold">AI Virtual Influencer Prompt Builder</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Character: {character.display_name} ({character.character_id})
+          </p>
+        </header>
 
-      <div className="ticks"></div>
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Orders</h2>
+              <p className="text-sm text-slate-500">
+                Add one or more orders, then recommend compatible compositions.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddBlankOrder}
+              className="rounded border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50"
+            >
+              + Add Order
+            </button>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <div className="mt-6 space-y-4">
+            {orders.length === 0 && (
+              <div className="rounded border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
+                No orders yet. Add one to start building prompts.
+              </div>
+            )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            {orders.map((order, index) => (
+              <div key={order.id} className="relative rounded-xl border border-slate-200 p-4">
+                <div className="mb-2 text-sm text-slate-500">Order {index + 1}</div>
+                <OrderInput value={order} onOrderChange={(patch) => updateOrder(order.id, patch)} />
+                <button
+                  type="button"
+                  onClick={() => removeOrder(order.id)}
+                  className="absolute right-4 top-4 text-sm text-red-600 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleRecommend}
+              disabled={orders.length === 0}
+              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            >
+              Recommend COMPs
+            </button>
+
+            {globalError && (
+              <div role="alert" className="text-sm text-red-600">
+                {globalError}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {Object.keys(compSelections).length > 0 && (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Composition Picker</h2>
+                <p className="text-sm text-slate-500">
+                  Uncheck any recommended compositions you do not want to assemble.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleAssemble}
+                className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
+              >
+                Assemble Prompts
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-6">
+              {orders.map((order, index) => {
+                const selection = compSelections[order.id];
+                if (!selection) {
+                  return null;
+                }
+
+                const recommended = compositions.filter((composition) =>
+                  selection.recommendedCompCodes.includes(composition.code),
+                );
+
+                return (
+                  <div key={order.id} className="space-y-3">
+                    <h3 className="text-sm font-semibold text-slate-700">Order {index + 1}</h3>
+                    <CompPicker
+                      recommended={recommended}
+                      selected={selection.selectedCompCodes}
+                      onToggle={(compCode) => toggleComp(order.id, compCode)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {assembledPrompts.length > 0 && (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Prompt Output</h2>
+                <p className="text-sm text-slate-500">
+                  Copy individual prompts or export them as a single text file.
+                </p>
+              </div>
+              <ExportButton prompts={assembledPrompts} />
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {assembledPrompts.map((assembledPrompt, index) => {
+                const order = orders.find((item) => item.id === assembledPrompt.orderId);
+                if (!order) {
+                  return null;
+                }
+
+                return (
+                  <PromptCard
+                    key={`${assembledPrompt.orderId}-${assembledPrompt.compCode}-${index}`}
+                    orderCode={`${order.outfit}_${order.scene}_${order.pose}_${order.expr}_${assembledPrompt.compCode}`}
+                    tier={order.tier}
+                    count={order.count}
+                    prompt={assembledPrompt.prompt}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        )}
+      </div>
+    </div>
+  );
 }
-
-export default App
