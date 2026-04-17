@@ -110,6 +110,28 @@ describe('OrderInput', () => {
       });
     });
 
+    describe('When the codes input is cleared (before blur)', () => {
+      it('shows the current selects as the placeholder when the input is cleared', async () => {
+        const user = userEvent.setup();
+        const onOrderChange = vi.fn();
+        const value = {
+          outfit: 'GRL-02',
+          scene: 'SCN-03',
+          pose: 'POS-04',
+          expr: 'EXP-05',
+          tier: 'T0' as const,
+          count: 1,
+        };
+        render(<OrderInput value={value} onOrderChange={onOrderChange} />);
+
+        const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
+        await user.click(input);
+        await user.clear(input);
+
+        expect(input.placeholder).toBe('GRL-02_SCN-03_POS-04_EXP-05');
+      });
+    });
+
     describe('The unified view', () => {
       it('Then all select inputs and count input are rendered', () => {
         render(<OrderInput value={null} onOrderChange={vi.fn()} />);

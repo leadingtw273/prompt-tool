@@ -82,7 +82,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
           onFocus={handleCodesFocus}
           onChange={(e) => handleCodesChange(e.target.value)}
           onBlur={handleCodesBlur}
-          placeholder="CAS-01_SCN-01_POS-01_EXP-01"
+          placeholder={derivedCodes}
           className="mt-1 w-full rounded border border-slate-700 bg-slate-800 p-2 font-mono text-slate-100 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none"
         />
         {error && (
