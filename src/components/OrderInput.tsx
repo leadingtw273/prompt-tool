@@ -61,7 +61,6 @@ export function OrderInput({ value, onOrderChange }: Props) {
   }
 
   function handleFieldChange(patch: Partial<Omit<Order, 'id'>>) {
-    setError(null);
     onOrderChange({ ...current, ...patch });
   }
 

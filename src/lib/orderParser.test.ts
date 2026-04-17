@@ -27,7 +27,7 @@ describe('parseCodes', () => {
     const result = parseCodes('CAS-01_SCN-01_POS-01');
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).toMatch(/four codes/i);
+      expect(result.error).toMatch(/四個|代碼/);
     }
   });
 
@@ -35,7 +35,7 @@ describe('parseCodes', () => {
     const result = parseCodes('XXX-01_SCN-01_POS-01_EXP-01');
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).toMatch(/outfit/i);
+      expect(result.error).toMatch(/服裝/);
     }
   });
 
@@ -43,7 +43,7 @@ describe('parseCodes', () => {
     const result = parseCodes('CAS-01_SCN-1_POS-01_EXP-01');
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).toMatch(/scene/i);
+      expect(result.error).toMatch(/場景/);
     }
   });
 
@@ -51,7 +51,7 @@ describe('parseCodes', () => {
     const result = parseCodes('CAS-01_SCN-01_POS-XX_EXP-01');
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).toMatch(/pose/i);
+      expect(result.error).toMatch(/姿勢/);
     }
   });
 
@@ -59,7 +59,7 @@ describe('parseCodes', () => {
     const result = parseCodes('CAS-01_SCN-01_POS-01_EXP-XX');
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).toMatch(/expression|expr/i);
+      expect(result.error).toMatch(/表情/);
     }
   });
 });

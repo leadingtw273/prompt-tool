@@ -48,7 +48,31 @@ describe('OrderInput', () => {
         await user.tab(); // blur
 
         expect(input.value).toBe('XXX-99_SCN-01_POS-01_EXP-01');
-        expect(screen.getByRole('alert').textContent).toMatch(/outfit/i);
+        expect(screen.getByRole('alert').textContent).toMatch(/服裝/);
+      });
+
+      it('keeps the error visible when a select field is changed while the draft is still invalid', async () => {
+        const user = userEvent.setup();
+        const onOrderChange = vi.fn();
+        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+
+        const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
+        await user.click(input);
+        await user.clear(input);
+        await user.type(input, 'XXX-99_SCN-01_POS-01_EXP-01');
+        await user.tab(); // failed blur — error appears
+
+        expect(screen.getByRole('alert').textContent).toMatch(/服裝/);
+
+        // change a select while draft is still invalid
+        const sceneSelect = screen.getByLabelText('場景') as HTMLSelectElement;
+        const otherScene = Array.from(sceneSelect.options).find((o) => o.value !== sceneSelect.value);
+        if (!otherScene) throw new Error('need at least 2 scene options for this test');
+        await user.selectOptions(sceneSelect, otherScene.value);
+
+        // error must still be displayed; draft must still be displayed
+        expect(screen.getByRole('alert').textContent).toMatch(/服裝/);
+        expect(input.value).toBe('XXX-99_SCN-01_POS-01_EXP-01');
       });
 
       it('preserves invalid input on re-focus after a failed blur', async () => {
