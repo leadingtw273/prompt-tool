@@ -57,3 +57,28 @@ export function parseOrderText(input: string): ParseResult {
     order: { outfit, scene, pose, expr, tier, count: countNum },
   };
 }
+
+export type CodesParseResult =
+  | { ok: true; codes: { outfit: string; scene: string; pose: string; expr: string } }
+  | { ok: false; error: string };
+
+export function parseCodes(input: string): CodesParseResult {
+  const codes = input.trim().split('_');
+  if (codes.length !== 4) {
+    return { ok: false, error: `Expected four codes joined by "_", got ${codes.length}` };
+  }
+  const [outfit, scene, pose, expr] = codes;
+  if (!CODE_PREFIXES.outfit.test(outfit)) {
+    return { ok: false, error: `Invalid outfit code: ${outfit}` };
+  }
+  if (!CODE_PREFIXES.scene.test(scene)) {
+    return { ok: false, error: `Invalid scene code: ${scene}` };
+  }
+  if (!CODE_PREFIXES.pose.test(pose)) {
+    return { ok: false, error: `Invalid pose code: ${pose}` };
+  }
+  if (!CODE_PREFIXES.expr.test(expr)) {
+    return { ok: false, error: `Invalid expression code: ${expr}` };
+  }
+  return { ok: true, codes: { outfit, scene, pose, expr } };
+}
