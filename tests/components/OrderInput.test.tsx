@@ -35,6 +35,20 @@ describe('OrderInput', () => {
         await user.tab();
         expect(screen.getByRole('alert')).toBeInTheDocument();
       });
+
+      it('keeps invalid input visible after blur so the user can correct it', async () => {
+        const user = userEvent.setup();
+        const onOrderChange = vi.fn();
+        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+
+        const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
+        await user.clear(input);
+        await user.type(input, 'XXX-99_SCN-01_POS-01_EXP-01');
+        await user.tab(); // blur
+
+        expect(input.value).toBe('XXX-99_SCN-01_POS-01_EXP-01');
+        expect(screen.getByRole('alert').textContent).toMatch(/outfit/i);
+      });
     });
 
     describe('The unified view', () => {

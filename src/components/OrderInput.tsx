@@ -50,11 +50,11 @@ export function OrderInput({ value, onOrderChange }: Props) {
     const result = parseCodes(text);
     if (result.ok) {
       setError(null);
+      setDraftCodes(null);
       onOrderChange({ ...current, ...result.codes });
     } else {
       setError(result.error);
     }
-    setDraftCodes(null);
   }
 
   function handleFieldChange(patch: Partial<Omit<Order, 'id'>>) {
