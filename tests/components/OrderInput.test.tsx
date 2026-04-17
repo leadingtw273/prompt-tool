@@ -92,6 +92,24 @@ describe('OrderInput', () => {
       });
     });
 
+    describe('When the codes input is cleared and blurred', () => {
+      it('silently reverts to the derived codes when the input is cleared and blurred', async () => {
+        const user = userEvent.setup();
+        const onOrderChange = vi.fn();
+        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+
+        const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
+        const initialValue = input.value;
+        await user.click(input);
+        await user.clear(input);
+        await user.tab();
+
+        expect(screen.queryByRole('alert')).toBeNull();
+        expect(input.value).toBe(initialValue);
+        expect(onOrderChange).not.toHaveBeenCalled();
+      });
+    });
+
     describe('The unified view', () => {
       it('Then all select inputs and count input are rendered', () => {
         render(<OrderInput value={null} onOrderChange={vi.fn()} />);

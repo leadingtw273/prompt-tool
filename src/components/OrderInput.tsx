@@ -50,6 +50,11 @@ export function OrderInput({ value, onOrderChange }: Props) {
 
   function handleCodesBlur(e: FocusEvent<HTMLInputElement>) {
     const text = e.currentTarget.value;
+    if (text.trim() === '') {
+      setError(null);
+      setDraftCodes(null);
+      return;
+    }
     const result = parseCodes(text);
     if (result.ok) {
       setError(null);
@@ -87,7 +92,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
         )}
       </div>
 
-      <div className="border-t border-slate-700" />
+      <div aria-hidden="true" className="my-2 border-t border-slate-700" />
 
       <div className="grid grid-cols-2 gap-3">
         <SelectField
@@ -120,7 +125,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
         />
       </div>
 
-      <div className="border-t border-slate-700" />
+      <div aria-hidden="true" className="my-2 border-t border-slate-700" />
 
       <div className="grid grid-cols-2 gap-3">
         <SelectField
