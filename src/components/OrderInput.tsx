@@ -70,7 +70,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
   }
 
   return (
-    <div className="space-y-3 rounded border border-slate-700 bg-slate-900 p-3">
+    <div className="rounded border border-slate-700 bg-slate-900 p-3">
       <div>
         <label htmlFor="order-codes" className="block text-sm font-medium text-slate-200">
           四項代碼組合
