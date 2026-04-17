@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { FocusEvent } from 'react';
 import { parseCodes } from '@/lib/orderParser';
 import { loadOutfits, loadScenes, loadPoses, loadExpressions } from '@/lib/dataLoader';
 import type { Order, Tier } from '@/types';
@@ -38,15 +39,17 @@ export function OrderInput({ value, onOrderChange }: Props) {
   const codesText = draftCodes ?? derivedCodes;
 
   function handleCodesFocus() {
-    setDraftCodes(derivedCodes);
+    if (draftCodes === null) {
+      setDraftCodes(derivedCodes);
+    }
   }
 
   function handleCodesChange(v: string) {
     setDraftCodes(v);
   }
 
-  function handleCodesBlur() {
-    const text = draftCodes ?? derivedCodes;
+  function handleCodesBlur(e: FocusEvent<HTMLInputElement>) {
+    const text = e.currentTarget.value;
     const result = parseCodes(text);
     if (result.ok) {
       setError(null);

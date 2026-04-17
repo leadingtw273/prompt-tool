@@ -42,12 +42,29 @@ describe('OrderInput', () => {
         render(<OrderInput value={null} onOrderChange={onOrderChange} />);
 
         const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
+        await user.click(input);
         await user.clear(input);
         await user.type(input, 'XXX-99_SCN-01_POS-01_EXP-01');
         await user.tab(); // blur
 
         expect(input.value).toBe('XXX-99_SCN-01_POS-01_EXP-01');
         expect(screen.getByRole('alert').textContent).toMatch(/outfit/i);
+      });
+
+      it('preserves invalid input on re-focus after a failed blur', async () => {
+        const user = userEvent.setup();
+        const onOrderChange = vi.fn();
+        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+
+        const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
+        await user.click(input);
+        await user.clear(input);
+        await user.type(input, 'XXX-99_SCN-01_POS-01_EXP-01');
+        await user.tab(); // failed blur — error shows, draft preserved
+        expect(input.value).toBe('XXX-99_SCN-01_POS-01_EXP-01');
+
+        await user.click(input); // re-focus — must NOT overwrite draft
+        expect(input.value).toBe('XXX-99_SCN-01_POS-01_EXP-01');
       });
     });
 
