@@ -18,9 +18,9 @@ import {
   loadTierConstraints,
 } from '@/lib/dataLoader';
 import { assemblePrompt } from '@/lib/promptAssembler';
+import { optimizePrompt } from '@/lib/aiOptimize';
 import { isConfigured, loadSettings } from '@/lib/settingsStorage';
 import { countWords } from '@/lib/tokenCount';
-import { optimizePrompt } from '@/lib/aiOptimize';
 import { useOrderStore } from '@/store/useOrderStore';
 import type { AssembledPrompt, AppSettings } from '@/types';
 
