@@ -5,8 +5,6 @@ import type {
   Expression,
   Composition,
   Character,
-  CompCompatibilityRule,
-  ForbiddenCombination,
   TierConstraints,
 } from '@/types';
 import outfitsYaml from '@/data/styles/outfits.yaml';
@@ -16,8 +14,6 @@ import expressionsYaml from '@/data/styles/expressions.yaml';
 import compositionsYaml from '@/data/styles/compositions.yaml';
 import acc001Yaml from '@/data/characters/ACC-001.yaml';
 import tierConstraintsYaml from '@/data/rules/tier_constraints.yaml';
-import forbiddenCombinationsYaml from '@/data/rules/forbidden_combinations.yaml';
-import compCompatibilityYaml from '@/data/rules/comp_compatibility.yaml';
 
 export function loadOutfits(): Outfit[] {
   return outfitsYaml as Outfit[];
@@ -52,12 +48,4 @@ export function loadCharacter(id: 'ACC-001'): Character {
 
 export function loadTierConstraints(): TierConstraints {
   return tierConstraintsYaml as TierConstraints;
-}
-
-export function loadForbiddenCombinations(): ForbiddenCombination[] {
-  return forbiddenCombinationsYaml as ForbiddenCombination[];
-}
-
-export function loadCompCompatibility(): CompCompatibilityRule[] {
-  return compCompatibilityYaml as CompCompatibilityRule[];
 }

@@ -4,14 +4,11 @@ import { ExportButton } from '@/components/ExportButton';
 import { OrderInput } from '@/components/OrderInput';
 import { PromptCard } from '@/components/PromptCard';
 import { SettingsModal } from '@/components/SettingsModal';
-import { isCompCompatible, isOrderForbidden } from '@/lib/compatibility';
 import { recommendComps } from '@/lib/compRecommender';
 import {
   loadCharacter,
   loadCompositions,
-  loadCompCompatibility,
   loadExpressions,
-  loadForbiddenCombinations,
   loadOutfits,
   loadPoses,
   loadScenes,
@@ -95,8 +92,6 @@ export default function App() {
   const expressions = loadExpressions();
   const compositions = loadCompositions();
   const tierConstraints = loadTierConstraints();
-  const compCompatibility = loadCompCompatibility();
-  const forbiddenCombinations = loadForbiddenCombinations();
 
   function handleAddBlankOrder() {
     addOrder({
@@ -114,25 +109,7 @@ export default function App() {
     setAssembledPrompts([]);
 
     for (const order of orders) {
-      const forbidden = isOrderForbidden(order, forbiddenCombinations);
-      if (forbidden.forbidden) {
-        setGlobalError(`Order ${order.id}: ${forbidden.reason}`);
-        return;
-      }
-
-      const compatiblePool = compositions.filter((composition) =>
-        isCompCompatible(
-          composition,
-          {
-            pose: order.pose,
-            outfit: order.outfit,
-            scene: order.scene,
-          },
-          compCompatibility,
-        ),
-      );
-
-      const recommended = recommendComps({ pool: compatiblePool, n: 5 });
+      const recommended = recommendComps({ pool: compositions, n: 5 });
 
       setCompSelection(order.id, {
         recommendedCompCodes: recommended.map((composition) => composition.code),

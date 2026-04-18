@@ -83,24 +83,6 @@ export interface Character {
   };
 }
 
-export interface CompCompatibilityRule {
-  comp_code: string;
-  forbidden_poses?: string[];
-  forbidden_outfits?: string[];
-  forbidden_scenes?: string[];
-}
-
-export interface ForbiddenCombination {
-  reason: string;
-  rules: Array<{
-    outfit?: string;
-    scene_blacklist?: string[];
-    pose_blacklist?: string[];
-    outfit_blacklist?: string[];
-    expression_blacklist?: string[];
-  }>;
-}
-
 export type TierConstraints = Record<Tier, string>;
 
 export interface Order {

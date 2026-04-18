@@ -7,8 +7,6 @@ import {
   loadCompositions,
   loadCharacter,
   loadTierConstraints,
-  loadForbiddenCombinations,
-  loadCompCompatibility,
 } from '@/lib/dataLoader';
 
 describe('dataLoader', () => {
