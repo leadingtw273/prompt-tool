@@ -1,20 +1,15 @@
 - code: EXP-01
   name: 自然微笑
   prompt: "gentle smile, soft expression, warm eyes"
-  tier_restriction: [T0, T1, T2, T3]
 - code: EXP-02
   name: 開懷大笑
   prompt: "laughing, open mouth smile, joyful"
-  tier_restriction: [T0, T1, T2, T3]
 - code: EXP-05
   name: 認真專注
   prompt: "focused, serious eyes, concentrated"
-  tier_restriction: [T0, T1, T2, T3]
 - code: EXP-06
   name: 俏皮微嘟
   prompt: "slight pout, playful, teasing"
-  tier_restriction: [T0, T1, T2, T3]
 - code: EXP-09
   name: 驚喜
   prompt: "surprised, cute reaction, wide eyes"
-  tier_restriction: [T0, T1, T2, T3]

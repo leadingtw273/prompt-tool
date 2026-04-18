@@ -24,7 +24,6 @@ export interface Expression {
   code: string;
   name: string;
   prompt: string;
-  tier_restriction: Tier[];
 }
 
 export type Shot =

@@ -62,7 +62,6 @@ const expr: Expression = {
   code: 'EXP-01',
   name: '自然微笑',
   prompt: 'gentle smile, soft expression, warm eyes',
-  tier_restriction: ['T0', 'T1', 'T2', 'T3'],
 };
 
 const comp: Composition = {
