@@ -5,7 +5,7 @@ import type { Tier } from '@/types';
 interface Props {
   orderCode: string;
   tier: Tier;
-  count: number;
+  comboLabel: string;
   prompt: string;
 }
 
@@ -15,7 +15,14 @@ const STATUS_LABEL: Record<'too_short' | 'ok' | 'too_long', string> = {
   too_long: '太長',
 };
 
-export function PromptCard({ orderCode, tier, count, prompt }: Props) {
+const TIER_TAG_CLASS: Record<Tier, string> = {
+  T0: 'bg-emerald-900/60 text-emerald-300',
+  T1: 'bg-blue-900/60 text-blue-300',
+  T2: 'bg-purple-900/60 text-purple-300',
+  T3: 'bg-red-900/60 text-red-300',
+};
+
+export function PromptCard({ orderCode, tier, comboLabel, prompt }: Props) {
   const [copied, setCopied] = useState(false);
   const wordCount = countWords(prompt);
   const status = checkLengthStatus(wordCount);
@@ -31,8 +38,11 @@ export function PromptCard({ orderCode, tier, count, prompt }: Props) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="font-mono text-sm text-slate-200">{orderCode}</div>
-          <div className="text-xs text-slate-400">
-            {tier} · 預計 {count} 張（seed 變體由 ComfyUI 處理）
+          <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
+            <span className={`rounded px-2 py-0.5 text-xs font-medium ${TIER_TAG_CLASS[tier]}`}>
+              {tier}
+            </span>
+            <span className="font-mono">{comboLabel}</span>
           </div>
         </div>
         <span

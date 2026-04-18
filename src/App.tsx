@@ -82,7 +82,7 @@ export default function App() {
 
       setCompSelection(order.id, {
         recommendedCompCodes: recommended.map((composition) => composition.code),
-        selectedCompCodes: recommended.map((composition) => composition.code),
+        selectedCompCodes: [],
       });
     }
   }
@@ -214,7 +214,10 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleAssemble}
-                className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+                disabled={Object.values(compSelections).every(
+                  (selection) => selection.selectedCompCodes.length === 0,
+                )}
+                className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600"
               >
                 組裝提示詞
               </button>
@@ -260,17 +263,27 @@ export default function App() {
 
             <div className="mt-6 space-y-4">
               {assembledPrompts.map((assembledPrompt, index) => {
-                const order = orders.find((item) => item.id === assembledPrompt.orderId);
+                const orderIndex = orders.findIndex((item) => item.id === assembledPrompt.orderId);
+                const order = orders[orderIndex];
                 if (!order) {
                   return null;
                 }
 
+                const outfitName = outfits.find((item) => item.code === order.outfit)?.name ?? order.outfit;
+                const sceneName = scenes.find((item) => item.code === order.scene)?.name ?? order.scene;
+                const poseName = poses.find((item) => item.code === order.pose)?.name ?? order.pose;
+                const exprName = expressions.find((item) => item.code === order.expr)?.name ?? order.expr;
+                const compName =
+                  compositions.find((item) => item.code === assembledPrompt.compCode)?.name ??
+                  assembledPrompt.compCode;
+                const comboLabel = `${outfitName}_${sceneName}_${poseName}_${exprName}_${compName}`;
+
                 return (
                   <PromptCard
                     key={`${assembledPrompt.orderId}-${assembledPrompt.compCode}-${index}`}
-                    orderCode={`${order.outfit}_${order.scene}_${order.pose}_${order.expr}_${assembledPrompt.compCode}`}
+                    orderCode={`工單 ${orderIndex + 1} - ${order.outfit}_${order.scene}_${order.pose}_${order.expr}_${assembledPrompt.compCode}`}
                     tier={order.tier}
-                    count={order.count}
+                    comboLabel={comboLabel}
                     prompt={assembledPrompt.prompt}
                   />
                 );

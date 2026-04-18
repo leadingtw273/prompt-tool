@@ -19,7 +19,7 @@ describe('PromptCard', () => {
           <PromptCard
             orderCode="CAS-02_SCN-01_POS-04_EXP-01_COMP-03"
             tier="T0"
-            count={4}
+            comboLabel="條紋襯衫_咖啡廳_坐姿_微笑_半身正面"
             prompt={samplePrompt}
           />,
         );
@@ -37,7 +37,7 @@ describe('PromptCard', () => {
           <PromptCard
             orderCode="CAS-02_SCN-01_POS-04_EXP-01_COMP-03"
             tier="T0"
-            count={4}
+            comboLabel="條紋襯衫_咖啡廳_坐姿_微笑_半身正面"
             prompt={samplePrompt}
           />,
         );
