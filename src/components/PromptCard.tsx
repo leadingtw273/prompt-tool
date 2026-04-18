@@ -169,6 +169,7 @@ function CollapsibleSection({ title, content, expanded, onToggle }: SectionProps
         <div
           role="button"
           tabIndex={0}
+          aria-expanded={expanded}
           onClick={onToggle}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {

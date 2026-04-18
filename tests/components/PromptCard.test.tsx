@@ -101,4 +101,25 @@ describe('PromptCard', () => {
     expect(onOptimize).toHaveBeenCalledTimes(1);
     confirmSpy.mockRestore();
   });
+
+  it('Enter key on the 原始提示詞 header toggles the section', async () => {
+    const user = userEvent.setup();
+    render(<PromptCard {...baseProps} />);
+    expect(screen.getByText(samplePrompt)).toBeVisible();
+    const header = screen.getByRole('button', { name: /原始提示詞/ });
+    header.focus();
+    await user.keyboard('{Enter}');
+    expect(screen.queryByText(samplePrompt)).not.toBeInTheDocument();
+  });
+
+  it('auto-collapses original and expands EN/ZH when optimized arrives via rerender', async () => {
+    const { rerender } = render(<PromptCard {...baseProps} />);
+    expect(screen.getByText(samplePrompt)).toBeVisible();
+    rerender(<PromptCard {...baseProps} optimized={{ en: 'NEW_EN', zh: 'NEW_ZH' }} />);
+    await waitFor(() => {
+      expect(screen.queryByText(samplePrompt)).not.toBeInTheDocument();
+    });
+    expect(screen.getByText('NEW_EN')).toBeVisible();
+    expect(screen.getByText('NEW_ZH')).toBeVisible();
+  });
 });
