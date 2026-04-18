@@ -99,4 +99,68 @@ describe('useOrderStore', () => {
       });
     });
   });
+
+  describe('optimize actions', () => {
+    it('setOptimizing toggles the optimizing flag on the matching AssembledPrompt', () => {
+      const { result } = renderHook(() => useOrderStore());
+      act(() => {
+        result.current.setAssembledPrompts([
+          { orderId: 'o1', compCode: 'COMP-01', prompt: 'p', estimatedWords: 1 },
+        ]);
+        result.current.setOptimizing('o1', 'COMP-01', true);
+      });
+      expect(result.current.assembledPrompts[0].optimizing).toBe(true);
+      act(() => {
+        result.current.setOptimizing('o1', 'COMP-01', false);
+      });
+      expect(result.current.assembledPrompts[0].optimizing).toBe(false);
+    });
+
+    it('setOptimizedResult stores the result and clears error', () => {
+      const { result } = renderHook(() => useOrderStore());
+      act(() => {
+        result.current.setAssembledPrompts([
+          {
+            orderId: 'o1',
+            compCode: 'COMP-01',
+            prompt: 'p',
+            estimatedWords: 1,
+            optimizeError: 'old error',
+          },
+        ]);
+        result.current.setOptimizedResult('o1', 'COMP-01', { en: 'EN', zh: 'ZH' });
+      });
+      expect(result.current.assembledPrompts[0].optimized).toEqual({ en: 'EN', zh: 'ZH' });
+      expect(result.current.assembledPrompts[0].optimizeError).toBeUndefined();
+    });
+
+    it('setOptimizeError stores error and clears previous result', () => {
+      const { result } = renderHook(() => useOrderStore());
+      act(() => {
+        result.current.setAssembledPrompts([
+          {
+            orderId: 'o1',
+            compCode: 'COMP-01',
+            prompt: 'p',
+            estimatedWords: 1,
+            optimized: { en: 'old', zh: 'old' },
+          },
+        ]);
+        result.current.setOptimizeError('o1', 'COMP-01', 'fail');
+      });
+      expect(result.current.assembledPrompts[0].optimizeError).toBe('fail');
+      expect(result.current.assembledPrompts[0].optimized).toBeUndefined();
+    });
+
+    it('non-matching (orderId, compCode) leaves prompts unchanged', () => {
+      const { result } = renderHook(() => useOrderStore());
+      act(() => {
+        result.current.setAssembledPrompts([
+          { orderId: 'o1', compCode: 'COMP-01', prompt: 'p', estimatedWords: 1 },
+        ]);
+        result.current.setOptimizing('o1', 'COMP-99', true);
+      });
+      expect(result.current.assembledPrompts[0].optimizing).toBeUndefined();
+    });
+  });
 });

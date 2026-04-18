@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AssembledPrompt, CompSelection, Order } from '@/types';
+import type { AssembledPrompt, CompSelection, OptimizedPrompt, Order } from '@/types';
 
 interface OrderStoreState {
   characterId: 'ACC-001';
@@ -15,6 +15,9 @@ interface OrderStoreActions {
   setCompSelection: (orderId: string, payload: Omit<CompSelection, 'orderId'>) => void;
   toggleComp: (orderId: string, compCode: string) => void;
   setAssembledPrompts: (prompts: AssembledPrompt[]) => void;
+  setOptimizing: (orderId: string, compCode: string, optimizing: boolean) => void;
+  setOptimizedResult: (orderId: string, compCode: string, result: OptimizedPrompt) => void;
+  setOptimizeError: (orderId: string, compCode: string, error: string) => void;
   reset: () => void;
 }
 
@@ -82,6 +85,34 @@ export const useOrderStore = create<OrderStoreState & OrderStoreActions>((set) =
   },
 
   setAssembledPrompts: (prompts) => set({ assembledPrompts: prompts }),
+
+  setOptimizing: (orderId, compCode, optimizing) => {
+    set((s) => ({
+      assembledPrompts: s.assembledPrompts.map((p) =>
+        p.orderId === orderId && p.compCode === compCode ? { ...p, optimizing } : p,
+      ),
+    }));
+  },
+
+  setOptimizedResult: (orderId, compCode, result) => {
+    set((s) => ({
+      assembledPrompts: s.assembledPrompts.map((p) =>
+        p.orderId === orderId && p.compCode === compCode
+          ? { ...p, optimized: result, optimizeError: undefined }
+          : p,
+      ),
+    }));
+  },
+
+  setOptimizeError: (orderId, compCode, error) => {
+    set((s) => ({
+      assembledPrompts: s.assembledPrompts.map((p) =>
+        p.orderId === orderId && p.compCode === compCode
+          ? { ...p, optimizeError: error, optimized: undefined }
+          : p,
+      ),
+    }));
+  },
 
   reset: () => set(initialState),
 }));
