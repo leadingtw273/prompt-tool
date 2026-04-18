@@ -1,51 +1,30 @@
 - code: CAS-01
   name: 基礎 T + 牛仔褲
   prompt: "white t-shirt, blue jeans, casual sneakers"
-  default_tier: T0
-  ocr_note: null
 - code: CAS-02
   name: 條紋襯衫 + 寬褲
   prompt: "striped button-up shirt, wide leg pants, loafers"
-  default_tier: T0
-  ocr_note: null
 - code: CAS-05
   name: 素色洋裝 + 草帽
   prompt: "plain cotton dress, straw hat, sandals"
-  default_tier: T0
-  ocr_note: null
 - code: GRL-02
   name: 彼得潘領 + A字裙
   prompt: "peter pan collar blouse, A-line skirt, bow"
-  default_tier: T0
-  ocr_note: "規格書原文「吃訟尖領」推測為彼得潘領，英文對照 peter pan collar，待導演確認"
 - code: GRL-04
   name: 泡泡袖上衣 + 短裙
   prompt: "puff sleeve top, mini skirt, knee socks"
-  default_tier: T0
-  ocr_note: null
 - code: FIT-01
   name: 運動背心 + 短褲
   prompt: "sports bra, running shorts, trainers"
-  default_tier: T0
-  ocr_note: null
 - code: ELG-02
   name: 套裝西裝
   prompt: "blazer suit, inner top, pointed heels"
-  default_tier: T0
-  ocr_note: null
 - code: INT-01
   name: 套裝居家服
   prompt: "matching pajama set, cozy socks"
-  default_tier: T0
-  ocr_note: null
 - code: INT-06
   name: 男友襯衫風
   prompt: "oversized boyfriend shirt, bare legs"
-  default_tier: T1
-  downgradable_to: T0
-  ocr_note: null
 - code: INT-07
   name: 絲質單品 + 短褲
   prompt: "silk camisole, satin shorts, messy hair"
-  default_tier: T1
-  ocr_note: null

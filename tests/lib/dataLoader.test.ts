@@ -17,8 +17,8 @@ describe('dataLoader', () => {
         expect(Array.isArray(outfits)).toBe(true);
         expect(outfits.length).toBeGreaterThan(0);
         expect(outfits[0]).toHaveProperty('code');
+        expect(outfits[0]).toHaveProperty('name');
         expect(outfits[0]).toHaveProperty('prompt');
-        expect(outfits[0]).toHaveProperty('default_tier');
       });
     });
 

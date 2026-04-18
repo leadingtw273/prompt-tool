@@ -4,9 +4,6 @@ export interface Outfit {
   code: string;
   name: string;
   prompt: string;
-  default_tier: Tier;
-  downgradable_to?: Tier;
-  ocr_note?: string | null;
 }
 
 export interface Scene {

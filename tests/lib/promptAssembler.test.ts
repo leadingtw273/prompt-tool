@@ -42,8 +42,6 @@ const outfit: Outfit = {
   code: 'CAS-02',
   name: '條紋襯衫 + 寬褲',
   prompt: 'striped button-up shirt, wide leg pants, loafers',
-  default_tier: 'T0',
-  ocr_note: null,
 };
 
 const scene: Scene = {
