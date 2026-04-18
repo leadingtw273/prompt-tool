@@ -12,6 +12,22 @@ describe('tokenCount', () => {
     });
   });
 
+  describe('Given a CJK-heavy string', () => {
+    describe('When countWords is called', () => {
+      it('Then each Han character counts as one word', () => {
+        expect(countWords('一個適合咖啡廳的構圖')).toBe(10);
+      });
+
+      it('Then mixes CJK characters with whitespace-separated Latin words', () => {
+        expect(countWords('close-up 特寫 正面 front view')).toBe(7);
+      });
+
+      it('Then Hiragana and Katakana also count per character', () => {
+        expect(countWords('あいうカタカナ')).toBe(7);
+      });
+    });
+  });
+
   describe('Given length thresholds 80 (too short) / 250 (too long)', () => {
     describe('When checkLengthStatus is called with 50 words', () => {
       it('Then returns "too_short"', () => {
