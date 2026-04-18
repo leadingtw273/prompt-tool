@@ -72,6 +72,10 @@ export function PromptCard({
       ? '優化中…'
       : 'AI 優化';
   const optimizeDisabled = !isConfigured || optimizing;
+  const optimizeDone = Boolean(optimized) && !optimizing;
+  const optimizeBtnClass = optimizeDone
+    ? 'bg-emerald-600 hover:bg-emerald-500'
+    : 'bg-blue-600 hover:bg-blue-500';
 
   return (
     <div className="space-y-3 rounded border border-slate-800 bg-slate-900/60 p-4">
@@ -89,8 +93,13 @@ export function PromptCard({
           type="button"
           onClick={handleOptimizeClick}
           disabled={optimizeDisabled}
-          className="shrink-0 rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-50 ${optimizeBtnClass}`}
         >
+          {optimizeDone && (
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
           {optimizeLabel}
         </button>
       </div>
