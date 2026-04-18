@@ -1,8 +1,29 @@
+import { useState } from 'react';
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CompPicker } from '@/components/CompPicker';
 import type { Composition } from '@/types';
+
+function ControlledPicker({
+  initial,
+  onChangeSpy,
+}: {
+  initial: string[];
+  onChangeSpy: (codes: string[]) => void;
+}) {
+  const [selected, setSelected] = useState(initial);
+  return (
+    <CompPicker
+      recommended={comps}
+      selected={selected}
+      onChange={(codes) => {
+        setSelected(codes);
+        onChangeSpy(codes);
+      }}
+    />
+  );
+}
 
 const comps: Composition[] = [
   {
@@ -22,52 +43,41 @@ const comps: Composition[] = [
 ];
 
 describe('CompPicker', () => {
-  describe('Given 2 recommended comps and 1 pre-selected', () => {
-    describe('When rendered', () => {
-      it('Then shows 2 checkboxes with the pre-selected one checked', () => {
-        render(<CompPicker recommended={comps} selected={['COMP-01']} onToggle={vi.fn()} />);
-        const cb1 = screen.getByRole('checkbox', { name: /COMP-01/ });
-        const cb2 = screen.getByRole('checkbox', { name: /COMP-04/ });
-        expect(cb1).toBeChecked();
-        expect(cb2).not.toBeChecked();
-      });
-    });
-
-    describe('When the unchecked checkbox is clicked', () => {
-      it('Then onToggle is called with its code', async () => {
-        const user = userEvent.setup();
-        const onToggle = vi.fn();
-        render(<CompPicker recommended={comps} selected={['COMP-01']} onToggle={onToggle} />);
-        await user.click(screen.getByRole('checkbox', { name: /COMP-04/ }));
-        expect(onToggle).toHaveBeenCalledWith('COMP-04');
-      });
-    });
+  it('renders each recommended comp as an option displaying only the Chinese name', () => {
+    render(<CompPicker recommended={comps} selected={[]} onChange={vi.fn()} />);
+    const select = screen.getByRole('listbox', { name: '構圖挑選' });
+    expect(select).toHaveAttribute('multiple');
+    expect(screen.getByRole('option', { name: '特寫正面' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: '全身 3/4' })).toBeInTheDocument();
+    expect(screen.queryByText(/COMP-01/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/COMP-04/)).not.toBeInTheDocument();
   });
 
-  describe('Given two CompPickers sharing a comp code', () => {
-    describe('When clicking the second picker label', () => {
-      it('Then only the second onToggle fires (no cross-picker leak)', async () => {
-        const user = userEvent.setup();
-        const onToggleA = vi.fn();
-        const onToggleB = vi.fn();
-        render(
-          <>
-            <div data-testid="picker-a">
-              <CompPicker recommended={comps} selected={[]} onToggle={onToggleA} />
-            </div>
-            <div data-testid="picker-b">
-              <CompPicker recommended={comps} selected={[]} onToggle={onToggleB} />
-            </div>
-          </>,
-        );
+  it('marks pre-selected options as selected', () => {
+    render(<CompPicker recommended={comps} selected={['COMP-01']} onChange={vi.fn()} />);
+    const optSelected = screen.getByRole('option', { name: '特寫正面' }) as HTMLOptionElement;
+    const optUnselected = screen.getByRole('option', { name: '全身 3/4' }) as HTMLOptionElement;
+    expect(optSelected.selected).toBe(true);
+    expect(optUnselected.selected).toBe(false);
+  });
 
-        const pickerB = screen.getByTestId('picker-b');
-        const labelB = pickerB.querySelector('label:has(input[aria-label^="COMP-01"])') as HTMLLabelElement;
-        await user.click(labelB);
+  it('calls onChange with the array of selected codes when selection changes', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<CompPicker recommended={comps} selected={[]} onChange={onChange} />);
+    const select = screen.getByRole('listbox', { name: '構圖挑選' });
+    await user.selectOptions(select, ['COMP-04']);
+    expect(onChange).toHaveBeenLastCalledWith(['COMP-04']);
+  });
 
-        expect(onToggleB).toHaveBeenCalledWith('COMP-01');
-        expect(onToggleA).not.toHaveBeenCalled();
-      });
-    });
+  it('accumulates multiple selections when the parent retains state', async () => {
+    const user = userEvent.setup();
+    const onChangeSpy = vi.fn();
+    render(<ControlledPicker initial={[]} onChangeSpy={onChangeSpy} />);
+    const select = screen.getByRole('listbox', { name: '構圖挑選' });
+    await user.selectOptions(select, ['COMP-01', 'COMP-04']);
+    const lastCall = onChangeSpy.mock.calls.at(-1)?.[0] as string[];
+    expect(lastCall).toContain('COMP-01');
+    expect(lastCall).toContain('COMP-04');
   });
 });

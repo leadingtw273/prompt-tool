@@ -29,7 +29,6 @@ export default function App() {
   const updateOrder = useOrderStore((state) => state.updateOrder);
   const removeOrder = useOrderStore((state) => state.removeOrder);
   const setCompSelection = useOrderStore((state) => state.setCompSelection);
-  const toggleComp = useOrderStore((state) => state.toggleComp);
   const setAssembledPrompts = useOrderStore((state) => state.setAssembledPrompts);
 
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -282,7 +281,12 @@ export default function App() {
                     <CompPicker
                       recommended={recommended}
                       selected={selection.selectedCompCodes}
-                      onToggle={(compCode) => toggleComp(order.id, compCode)}
+                      onChange={(codes) =>
+                        setCompSelection(order.id, {
+                          recommendedCompCodes: selection.recommendedCompCodes,
+                          selectedCompCodes: codes,
+                        })
+                      }
                     />
                   </div>
                 );
