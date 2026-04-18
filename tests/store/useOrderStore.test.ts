@@ -162,5 +162,20 @@ describe('useOrderStore', () => {
       });
       expect(result.current.assembledPrompts[0].optimizing).toBeUndefined();
     });
+
+    it('only updates the matching (orderId, compCode) entry when multiple prompts exist', () => {
+      const { result } = renderHook(() => useOrderStore());
+      act(() => {
+        result.current.setAssembledPrompts([
+          { orderId: 'o1', compCode: 'COMP-01', prompt: 'p1', estimatedWords: 1 },
+          { orderId: 'o1', compCode: 'COMP-02', prompt: 'p2', estimatedWords: 1 },
+          { orderId: 'o2', compCode: 'COMP-01', prompt: 'p3', estimatedWords: 1 },
+        ]);
+        result.current.setOptimizing('o1', 'COMP-01', true);
+      });
+      expect(result.current.assembledPrompts[0].optimizing).toBe(true);
+      expect(result.current.assembledPrompts[1].optimizing).toBeUndefined();
+      expect(result.current.assembledPrompts[2].optimizing).toBeUndefined();
+    });
   });
 });
