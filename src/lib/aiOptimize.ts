@@ -12,11 +12,19 @@ interface OptimizeParams {
   originalPrompt: string;
 }
 
+const MODEL_API_CODE: Record<AppSettings['model'], string> = {
+  'gemini-3-flash': 'gemini-3-flash-preview',
+  'gemini-3.1-pro': 'gemini-3.1-pro-preview',
+  'gemini-2.5-flash': 'gemini-2.5-flash',
+  'gemini-2.5-pro': 'gemini-2.5-pro',
+};
+
 export async function optimizePrompt(params: OptimizeParams): Promise<OptimizedPrompt> {
   const { apiKey, model, systemPrompt, originalPrompt } = params;
   const userText = `${systemPrompt}\n\n${FORMAT_INSTRUCTION}\n\n---\n\n${originalPrompt}`;
+  const apiModel = MODEL_API_CODE[model];
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${encodeURIComponent(
     apiKey,
   )}`;
 

@@ -58,6 +58,18 @@ describe('optimizePrompt', () => {
     expect(text).toMatch(/JSON object/);
   });
 
+  it('maps gemini-3-flash and gemini-3.1-pro to their -preview API codes in the URL', async () => {
+    const fetchMock = mockFetchOk('{"en":"EN","zh":"ZH"}');
+    vi.stubGlobal('fetch', fetchMock);
+    await optimizePrompt({ ...baseParams, model: 'gemini-3-flash' });
+    await optimizePrompt({ ...baseParams, model: 'gemini-3.1-pro' });
+    await optimizePrompt({ ...baseParams, model: 'gemini-2.5-pro' });
+    const urls = fetchMock.mock.calls.map(([url]) => url as string);
+    expect(urls[0]).toContain('/models/gemini-3-flash-preview:generateContent');
+    expect(urls[1]).toContain('/models/gemini-3.1-pro-preview:generateContent');
+    expect(urls[2]).toContain('/models/gemini-2.5-pro:generateContent');
+  });
+
   it('throws "Gemini 回傳格式不符" when en or zh is missing', async () => {
     vi.stubGlobal('fetch', mockFetchOk('{"en":"EN"}'));
     await expect(optimizePrompt(baseParams)).rejects.toThrow('Gemini 回傳格式不符');
