@@ -4,22 +4,28 @@ import type { Composition } from '@/types';
 interface Option {
   value: string;
   label: string;
+  isRecommended: boolean;
 }
 
 interface Props {
-  recommended: Composition[];
+  options: Composition[];
+  recommendedCodes: string[];
   selected: string[];
   onChange: (selectedCompCodes: string[]) => void;
 }
 
-export function CompPicker({ recommended, selected, onChange }: Props) {
-  const options: Option[] = recommended.map((c) => ({ value: c.code, label: c.name }));
-  const value = options.filter((o) => selected.includes(o.value));
+export function CompPicker({ options, recommendedCodes, selected, onChange }: Props) {
+  const selectOptions: Option[] = options.map((c) => ({
+    value: c.code,
+    label: c.name,
+    isRecommended: recommendedCodes.includes(c.code),
+  }));
+  const value = selectOptions.filter((o) => selected.includes(o.value));
 
   return (
     <Select<Option, true>
       isMulti
-      options={options}
+      options={selectOptions}
       value={value}
       onChange={(next: MultiValue<Option>) => onChange(next.map((o) => o.value))}
       closeMenuOnSelect={false}
@@ -27,6 +33,12 @@ export function CompPicker({ recommended, selected, onChange }: Props) {
       placeholder="選擇構圖…"
       noOptionsMessage={() => '無可用構圖'}
       aria-label="構圖挑選"
+      formatOptionLabel={(opt: Option) => (
+        <span className={opt.isRecommended ? 'text-blue-400' : ''}>
+          {opt.isRecommended ? '⭐ ' : ''}
+          {opt.label}
+        </span>
+      )}
       unstyled
       classNames={{
         control: ({ isFocused }) =>

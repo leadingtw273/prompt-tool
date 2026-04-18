@@ -14,6 +14,7 @@ import {
   loadTierConstraints,
 } from '@/lib/dataLoader';
 import { assemblePrompt } from '@/lib/promptAssembler';
+import { getRecommendedCompCodes } from '@/lib/compRecommendation';
 import { optimizePrompt, optimizeSingleLanguage } from '@/lib/aiOptimize';
 import { isConfigured, loadSettings } from '@/lib/settingsStorage';
 import { countWords } from '@/lib/tokenCount';
@@ -271,12 +272,15 @@ export default function App() {
                 const recommended = compositions.filter((composition) =>
                   selection.recommendedCompCodes.includes(composition.code),
                 );
+                const pose = poses.find((p) => p.code === order.pose);
+                const recommendedCodes = getRecommendedCompCodes(pose, compositions);
 
                 return (
                   <div key={order.id} className="space-y-3">
                     <h3 className="text-sm font-semibold text-slate-300">工單 {index + 1}</h3>
                     <CompPicker
-                      recommended={recommended}
+                      options={recommended}
+                      recommendedCodes={recommendedCodes}
                       selected={selection.selectedCompCodes}
                       onChange={(codes) =>
                         setCompSelection(order.id, {
