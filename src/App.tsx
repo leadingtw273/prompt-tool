@@ -300,7 +300,7 @@ export default function App() {
             </div>
 
             <div className="mt-6 space-y-4">
-              {assembledPrompts.map((assembledPrompt, index) => {
+              {assembledPrompts.map((assembledPrompt) => {
                 const orderIndex = orders.findIndex((item) => item.id === assembledPrompt.orderId);
                 const order = orders[orderIndex];
                 if (!order) {
@@ -318,7 +318,7 @@ export default function App() {
 
                 return (
                   <PromptCard
-                    key={`${assembledPrompt.orderId}-${assembledPrompt.compCode}-${index}`}
+                    key={`${assembledPrompt.orderId}-${assembledPrompt.compCode}`}
                     orderCode={`工單 ${orderIndex + 1} - ${order.outfit}_${order.scene}_${order.pose}_${order.expr}_${assembledPrompt.compCode}`}
                     tier={order.tier}
                     comboLabel={comboLabel}
