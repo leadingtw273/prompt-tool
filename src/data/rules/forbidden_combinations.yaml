@@ -6,6 +6,3 @@
       scene_blacklist: [SCN-03, SCN-04, SCN-06]
     - outfit: INT-07
       scene_blacklist: [SCN-03, SCN-04, SCN-06]
-- reason: "Phase 1 Tier restriction"
-  rules:
-    - tier_blacklist: [T2, T3]

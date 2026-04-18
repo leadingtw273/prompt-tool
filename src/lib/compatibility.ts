@@ -7,6 +7,7 @@ import type {
   Tier,
 } from '@/types';
 
+
 interface CompCheckContext {
   pose: string;
   outfit: string;
@@ -42,9 +43,6 @@ export function isOrderForbidden(
 ): { forbidden: boolean; reason?: string } {
   for (const group of forbiddenRules) {
     for (const rule of group.rules) {
-      if (rule.tier_blacklist?.includes(order.tier)) {
-        return { forbidden: true, reason: `${group.reason}: tier ${order.tier} blacklisted` };
-      }
       if (rule.outfit_blacklist?.includes(order.outfit)) {
         return { forbidden: true, reason: `${group.reason}: outfit ${order.outfit} blacklisted` };
       }

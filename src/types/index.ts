@@ -96,7 +96,6 @@ export interface ForbiddenCombination {
     outfit?: string;
     scene_blacklist?: string[];
     pose_blacklist?: string[];
-    tier_blacklist?: Tier[];
     outfit_blacklist?: string[];
     expression_blacklist?: string[];
   }>;

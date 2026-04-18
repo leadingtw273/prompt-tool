@@ -61,24 +61,6 @@ describe('compatibility', () => {
     });
   });
 
-  describe('Given a Tier-blacklist forbidden combination', () => {
-    describe('When isOrderForbidden is checked with tier T2', () => {
-      it('Then returns true because T2 is blacklisted', () => {
-        const rules = [
-          {
-            reason: 'Phase 1 restriction',
-            rules: [{ tier_blacklist: ['T2' as const, 'T3' as const] }],
-          },
-        ];
-        const result = isOrderForbidden(
-          { outfit: 'CAS-02', scene: 'SCN-01', pose: 'POS-04', expr: 'EXP-01', tier: 'T2', count: 1 },
-          rules,
-        );
-        expect(result.forbidden).toBe(true);
-      });
-    });
-  });
-
   describe('Given an expression restricted to T2+ only', () => {
     describe('When isTierAllowedForExpression is checked with T0', () => {
       it('Then returns false', () => {
