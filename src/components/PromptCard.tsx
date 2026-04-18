@@ -40,9 +40,6 @@ export function PromptCard({
   isConfigured,
   onOptimize,
 }: Props) {
-  const wordCount = countWords(prompt);
-  const status = checkLengthStatus(wordCount);
-
   const [expanded, setExpanded] = useState<Record<SectionKey, boolean>>({
     original: true,
     en: false,
@@ -78,28 +75,14 @@ export function PromptCard({
 
   return (
     <div className="space-y-3 rounded border border-slate-800 bg-slate-900/60 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="font-mono text-sm text-slate-200">{orderCode}</div>
-          <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
-            <span className={`rounded px-2 py-0.5 text-xs font-medium ${TIER_TAG_CLASS[tier]}`}>
-              {tier}
-            </span>
-            <span className="font-mono">{comboLabel}</span>
-          </div>
+      <div>
+        <div className="font-mono text-sm text-slate-200">{orderCode}</div>
+        <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
+          <span className={`rounded px-2 py-0.5 text-xs font-medium ${TIER_TAG_CLASS[tier]}`}>
+            {tier}
+          </span>
+          <span className="font-mono">{comboLabel}</span>
         </div>
-        <span
-          data-testid="length-status"
-          className={
-            status === 'ok'
-              ? 'rounded bg-emerald-900/60 px-2 py-1 text-xs text-emerald-300'
-              : status === 'too_short'
-                ? 'rounded bg-amber-900/60 px-2 py-1 text-xs text-amber-300'
-                : 'rounded bg-red-900/60 px-2 py-1 text-xs text-red-300'
-          }
-        >
-          {wordCount} 字 · {STATUS_LABEL[status]}
-        </span>
       </div>
 
       <div>
@@ -155,6 +138,14 @@ interface SectionProps {
 
 function CollapsibleSection({ title, content, expanded, onToggle }: SectionProps) {
   const [copied, setCopied] = useState(false);
+  const wordCount = countWords(content);
+  const status = checkLengthStatus(wordCount);
+  const statusClass =
+    status === 'ok'
+      ? 'bg-emerald-900/60 text-emerald-300'
+      : status === 'too_short'
+        ? 'bg-amber-900/60 text-amber-300'
+        : 'bg-red-900/60 text-red-300';
 
   async function handleCopy(e: React.MouseEvent) {
     e.stopPropagation();
@@ -165,7 +156,7 @@ function CollapsibleSection({ title, content, expanded, onToggle }: SectionProps
 
   return (
     <div className="rounded border border-slate-800 bg-slate-950/60">
-      <div className="flex items-center justify-between px-3 py-2">
+      <div className="flex items-center justify-between gap-2 px-3 py-2">
         <div
           role="button"
           tabIndex={0}
@@ -182,6 +173,12 @@ function CollapsibleSection({ title, content, expanded, onToggle }: SectionProps
           <span>{expanded ? '▼' : '▶'}</span>
           <span>{title}</span>
         </div>
+        <span
+          data-testid="length-status"
+          className={`rounded px-2 py-1 text-xs ${statusClass}`}
+        >
+          {wordCount} 字 · {STATUS_LABEL[status]}
+        </span>
         <button
           type="button"
           onClick={handleCopy}
