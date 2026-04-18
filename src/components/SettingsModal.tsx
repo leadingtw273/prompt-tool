@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { AppSettings } from '@/types';
 import { DEFAULT_SYSTEM_PROMPT, loadSettings, saveSettings } from '@/lib/settingsStorage';
 
@@ -13,6 +13,7 @@ export function SettingsModal({ open, onClose, onSaved }: Props) {
   const [model, setModel] = useState<AppSettings['model']>('gemini-2.5-flash');
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
   const [error, setError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -21,8 +22,18 @@ export function SettingsModal({ open, onClose, onSaved }: Props) {
       setModel(current.model);
       setSystemPrompt(current.systemPrompt);
       setError(null);
+      dialogRef.current?.focus();
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
 
   if (!open) {
     return null;
@@ -45,11 +56,16 @@ export function SettingsModal({ open, onClose, onSaved }: Props) {
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-modal-title"
         className="w-full max-w-lg space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-100">AI 優化設定</h2>
+          <h2 id="settings-modal-title" className="text-lg font-semibold text-slate-100">AI 優化設定</h2>
           <button
             type="button"
             aria-label="關閉"
@@ -66,8 +82,9 @@ export function SettingsModal({ open, onClose, onSaved }: Props) {
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+            className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none"
             aria-label="Gemini API Key"
+            autoComplete="off"
           />
           <a
             href="https://aistudio.google.com/apikey"
@@ -84,7 +101,7 @@ export function SettingsModal({ open, onClose, onSaved }: Props) {
           <select
             value={model}
             onChange={(e) => setModel(e.target.value as AppSettings['model'])}
-            className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+            className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none"
             aria-label="Model"
           >
             <option value="gemini-2.5-flash">gemini-2.5-flash（推薦）</option>
@@ -98,7 +115,7 @@ export function SettingsModal({ open, onClose, onSaved }: Props) {
             rows={6}
             value={systemPrompt}
             onChange={(e) => setSystemPrompt(e.target.value)}
-            className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+            className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none"
             aria-label="系統提示詞"
           />
           <button
