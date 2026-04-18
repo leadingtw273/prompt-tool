@@ -65,6 +65,9 @@ export async function optimizePrompt(params: OptimizeParams): Promise<OptimizedP
     throw new Error('回傳格式解析失敗');
   }
 
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Gemini 回傳格式不符');
+  }
   const obj = parsed as { en?: unknown; zh?: unknown };
   if (typeof obj.en !== 'string' || typeof obj.zh !== 'string' || !obj.en || !obj.zh) {
     throw new Error('Gemini 回傳格式不符');

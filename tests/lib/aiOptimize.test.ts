@@ -87,4 +87,19 @@ describe('optimizePrompt', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('network down')));
     await expect(optimizePrompt(baseParams)).rejects.toThrow('網路錯誤');
   });
+
+  it('throws the raw API message on HTTP 400 without api key in the message', async () => {
+    vi.stubGlobal('fetch', mockFetchErr(400, 'Request payload size exceeds the limit'));
+    await expect(optimizePrompt(baseParams)).rejects.toThrow('Request payload size exceeds the limit');
+  });
+
+  it('throws "Gemini 回傳格式不符" when response body is null JSON', async () => {
+    vi.stubGlobal('fetch', mockFetchOk('null'));
+    await expect(optimizePrompt(baseParams)).rejects.toThrow('Gemini 回傳格式不符');
+  });
+
+  it('throws "Gemini 回傳格式不符" when response body is JSON array', async () => {
+    vi.stubGlobal('fetch', mockFetchOk('[1,2,3]'));
+    await expect(optimizePrompt(baseParams)).rejects.toThrow('Gemini 回傳格式不符');
+  });
 });
