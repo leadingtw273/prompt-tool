@@ -3,6 +3,7 @@ import { CompPicker } from '@/components/CompPicker';
 import { ExportButton } from '@/components/ExportButton';
 import { OrderInput } from '@/components/OrderInput';
 import { PromptCard } from '@/components/PromptCard';
+import { SettingsModal } from '@/components/SettingsModal';
 import { isCompCompatible, isOrderForbidden } from '@/lib/compatibility';
 import { recommendComps } from '@/lib/compRecommender';
 import {
@@ -17,9 +18,11 @@ import {
   loadTierConstraints,
 } from '@/lib/dataLoader';
 import { assemblePrompt } from '@/lib/promptAssembler';
+import { isConfigured, loadSettings } from '@/lib/settingsStorage';
 import { countWords } from '@/lib/tokenCount';
+import { optimizePrompt } from '@/lib/aiOptimize';
 import { useOrderStore } from '@/store/useOrderStore';
-import type { AssembledPrompt } from '@/types';
+import type { AssembledPrompt, AppSettings } from '@/types';
 
 export default function App() {
   const orders = useOrderStore((state) => state.orders);
@@ -33,6 +36,30 @@ export default function App() {
   const setAssembledPrompts = useOrderStore((state) => state.setAssembledPrompts);
 
   const [globalError, setGlobalError] = useState<string | null>(null);
+
+  const setOptimizing = useOrderStore((state) => state.setOptimizing);
+  const setOptimizedResult = useOrderStore((state) => state.setOptimizedResult);
+  const setOptimizeError = useOrderStore((state) => state.setOptimizeError);
+
+  const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  async function handleOptimize(orderId: string, compCode: string, prompt: string) {
+    setOptimizing(orderId, compCode, true);
+    try {
+      const result = await optimizePrompt({
+        apiKey: settings.apiKey,
+        model: settings.model,
+        systemPrompt: settings.systemPrompt,
+        originalPrompt: prompt,
+      });
+      setOptimizedResult(orderId, compCode, result);
+    } catch (err) {
+      setOptimizeError(orderId, compCode, err instanceof Error ? err.message : String(err));
+    } finally {
+      setOptimizing(orderId, compCode, false);
+    }
+  }
 
   const character = loadCharacter('ACC-001');
   const outfits = loadOutfits();
@@ -135,7 +162,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
       <div className="mx-auto max-w-5xl space-y-6">
-        <header className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
+        <header className="relative rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
             Prompt Tool
           </p>
@@ -143,6 +170,17 @@ export default function App() {
           <p className="mt-2 text-sm text-slate-400">
             角色：{character.display_name}（{character.character_id}）
           </p>
+          <button
+            type="button"
+            aria-label="設定"
+            onClick={() => setSettingsOpen(true)}
+            className="absolute right-6 top-6 rounded p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
         </header>
 
         <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
@@ -285,12 +323,28 @@ export default function App() {
                     tier={order.tier}
                     comboLabel={comboLabel}
                     prompt={assembledPrompt.prompt}
+                    optimized={assembledPrompt.optimized}
+                    optimizing={assembledPrompt.optimizing}
+                    optimizeError={assembledPrompt.optimizeError}
+                    isConfigured={isConfigured(settings)}
+                    onOptimize={() =>
+                      handleOptimize(
+                        assembledPrompt.orderId,
+                        assembledPrompt.compCode,
+                        assembledPrompt.prompt,
+                      )
+                    }
                   />
                 );
               })}
             </div>
           </section>
         )}
+        <SettingsModal
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          onSaved={(next) => setSettings(next)}
+        />
       </div>
     </div>
   );
