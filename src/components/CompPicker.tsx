@@ -11,11 +11,9 @@ export function CompPicker({ recommended, selected, onToggle }: Props) {
     <div className="space-y-2">
       {recommended.map((c) => {
         const isSelected = selected.includes(c.code);
-        const id = `comp-${c.code}`;
         return (
           <label
             key={c.code}
-            htmlFor={id}
             className={`flex cursor-pointer items-start gap-3 rounded border p-3 transition ${
               isSelected
                 ? 'border-blue-500/60 bg-slate-800/80'
@@ -23,7 +21,6 @@ export function CompPicker({ recommended, selected, onToggle }: Props) {
             }`}
           >
             <input
-              id={id}
               type="checkbox"
               checked={isSelected}
               onChange={() => onToggle(c.code)}

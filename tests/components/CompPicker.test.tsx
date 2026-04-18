@@ -43,4 +43,31 @@ describe('CompPicker', () => {
       });
     });
   });
+
+  describe('Given two CompPickers sharing a comp code', () => {
+    describe('When clicking the second picker label', () => {
+      it('Then only the second onToggle fires (no cross-picker leak)', async () => {
+        const user = userEvent.setup();
+        const onToggleA = vi.fn();
+        const onToggleB = vi.fn();
+        render(
+          <>
+            <div data-testid="picker-a">
+              <CompPicker recommended={comps} selected={[]} onToggle={onToggleA} />
+            </div>
+            <div data-testid="picker-b">
+              <CompPicker recommended={comps} selected={[]} onToggle={onToggleB} />
+            </div>
+          </>,
+        );
+
+        const pickerB = screen.getByTestId('picker-b');
+        const labelB = pickerB.querySelector('label:has(input[aria-label^="COMP-01"])') as HTMLLabelElement;
+        await user.click(labelB);
+
+        expect(onToggleB).toHaveBeenCalledWith('COMP-01');
+        expect(onToggleA).not.toHaveBeenCalled();
+      });
+    });
+  });
 });
