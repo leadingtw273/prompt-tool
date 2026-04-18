@@ -151,6 +151,25 @@ describe('PromptCard', () => {
     expect(onRefresh).toHaveBeenCalledWith('zh');
   });
 
+  it('masks section content with spinner and disables refresh when optimizingLanguage matches', () => {
+    render(
+      <PromptCard
+        {...baseProps}
+        optimized={{ en: 'EN text', zh: 'ZH text' }}
+        optimizing={true}
+        optimizingLanguage="en"
+        onRefreshLanguage={vi.fn()}
+      />,
+    );
+    // EN section shows spinner, hides content
+    expect(screen.getByRole('status')).toHaveTextContent('擷取中');
+    expect(screen.queryByText('EN text')).not.toBeInTheDocument();
+    expect(screen.getByText('ZH text')).toBeVisible();
+    // Both refresh buttons disabled (global optimizing=true)
+    const refreshButtons = screen.getAllByRole('button', { name: '重新生成' });
+    refreshButtons.forEach((b) => expect(b).toBeDisabled());
+  });
+
   it('refresh icon does not appear on the original section', () => {
     render(
       <PromptCard

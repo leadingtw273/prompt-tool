@@ -131,6 +131,7 @@ export interface AssembledPrompt {
   estimatedWords: number;
   optimized?: OptimizedPrompt;
   optimizing?: boolean;
+  optimizingLanguage?: 'en' | 'zh';
   optimizeError?: string;
 }
 

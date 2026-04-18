@@ -16,6 +16,11 @@ interface OrderStoreActions {
   toggleComp: (orderId: string, compCode: string) => void;
   setAssembledPrompts: (prompts: AssembledPrompt[]) => void;
   setOptimizing: (orderId: string, compCode: string, optimizing: boolean) => void;
+  setOptimizingLanguage: (
+    orderId: string,
+    compCode: string,
+    language: 'en' | 'zh' | null,
+  ) => void;
   setOptimizedResult: (orderId: string, compCode: string, result: OptimizedPrompt) => void;
   setOptimizedField: (
     orderId: string,
@@ -96,6 +101,16 @@ export const useOrderStore = create<OrderStoreState & OrderStoreActions>((set) =
     set((s) => ({
       assembledPrompts: s.assembledPrompts.map((p) =>
         p.orderId === orderId && p.compCode === compCode ? { ...p, optimizing } : p,
+      ),
+    }));
+  },
+
+  setOptimizingLanguage: (orderId, compCode, language) => {
+    set((s) => ({
+      assembledPrompts: s.assembledPrompts.map((p) =>
+        p.orderId === orderId && p.compCode === compCode
+          ? { ...p, optimizingLanguage: language ?? undefined }
+          : p,
       ),
     }));
   },

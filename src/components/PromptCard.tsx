@@ -10,6 +10,7 @@ interface Props {
   prompt: string;
   optimized?: OptimizedPrompt;
   optimizing?: boolean;
+  optimizingLanguage?: 'en' | 'zh';
   optimizeError?: string;
   isConfigured: boolean;
   onOptimize: () => void;
@@ -38,6 +39,7 @@ export function PromptCard({
   prompt,
   optimized,
   optimizing,
+  optimizingLanguage,
   optimizeError,
   isConfigured,
   onOptimize,
@@ -133,6 +135,7 @@ export function PromptCard({
             onToggle={() => toggle('en')}
             onRefresh={onRefreshLanguage ? () => onRefreshLanguage('en') : undefined}
             refreshDisabled={optimizing}
+            refreshing={optimizingLanguage === 'en'}
             refreshConfirmMessage="確認要重新生成英文優化提示詞？這會覆蓋目前的結果。"
           />
           <CollapsibleSection
@@ -142,6 +145,7 @@ export function PromptCard({
             onToggle={() => toggle('zh')}
             onRefresh={onRefreshLanguage ? () => onRefreshLanguage('zh') : undefined}
             refreshDisabled={optimizing}
+            refreshing={optimizingLanguage === 'zh'}
             refreshConfirmMessage="確認要重新生成中文優化提示詞？這會覆蓋目前的結果。"
           />
         </>
@@ -166,6 +170,7 @@ interface SectionProps {
   onToggle: () => void;
   onRefresh?: () => void;
   refreshDisabled?: boolean;
+  refreshing?: boolean;
   refreshConfirmMessage?: string;
 }
 
@@ -176,6 +181,7 @@ function CollapsibleSection({
   onToggle,
   onRefresh,
   refreshDisabled,
+  refreshing,
   refreshConfirmMessage,
 }: SectionProps) {
   const [copied, setCopied] = useState(false);
@@ -198,7 +204,7 @@ function CollapsibleSection({
 
   return (
     <div className="rounded border border-slate-800 bg-slate-950/60">
-      <div className="flex items-center justify-between gap-2 px-3 py-2">
+      <div className="flex items-center gap-2 px-3 py-2">
         <div
           role="button"
           tabIndex={0}
@@ -210,11 +216,32 @@ function CollapsibleSection({
               onToggle();
             }
           }}
-          className="flex flex-1 cursor-pointer items-center gap-2 text-sm text-slate-200"
+          className="flex cursor-pointer items-center gap-2 text-sm text-slate-200"
         >
           <span>{expanded ? '▼' : '▶'}</span>
           <span>{title}</span>
         </div>
+        {onRefresh && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setRefreshConfirmOpen(true);
+            }}
+            disabled={refreshDisabled}
+            aria-label="重新生成"
+            title="重新生成"
+            className="rounded p-1.5 text-slate-300 hover:bg-slate-800 hover:text-slate-100 disabled:opacity-50 disabled:hover:bg-transparent"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 2v6h-6" />
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+              <path d="M3 22v-6h6" />
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+            </svg>
+          </button>
+        )}
+        <div className="flex-1" />
         <span
           data-testid="length-status"
           className={`rounded px-2 py-1 text-xs ${statusClass}`}
@@ -239,31 +266,35 @@ function CollapsibleSection({
             </svg>
           )}
         </button>
-        {onRefresh && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setRefreshConfirmOpen(true);
-            }}
-            disabled={refreshDisabled}
-            aria-label="重新生成"
-            title="重新生成"
-            className="rounded p-1.5 text-slate-300 hover:bg-slate-800 hover:text-slate-100 disabled:opacity-50 disabled:hover:bg-transparent"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 2v6h-6" />
-              <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
-              <path d="M3 22v-6h6" />
-              <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
-            </svg>
-          </button>
-        )}
       </div>
       {expanded && (
-        <pre className="whitespace-pre-wrap border-t border-slate-800 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-200">
-          {content}
-        </pre>
+        refreshing ? (
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex items-center justify-center gap-2 border-t border-slate-800 bg-slate-950 px-3 py-8 text-sm text-slate-400"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="animate-spin"
+            >
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            擷取中…
+          </div>
+        ) : (
+          <pre className="whitespace-pre-wrap border-t border-slate-800 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-200">
+            {content}
+          </pre>
+        )
       )}
       {onRefresh && (
         <ConfirmDialog

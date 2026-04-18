@@ -38,6 +38,7 @@ export default function App() {
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   const setOptimizing = useOrderStore((state) => state.setOptimizing);
+  const setOptimizingLanguage = useOrderStore((state) => state.setOptimizingLanguage);
   const setOptimizedResult = useOrderStore((state) => state.setOptimizedResult);
   const setOptimizedField = useOrderStore((state) => state.setOptimizedField);
   const setOptimizeError = useOrderStore((state) => state.setOptimizeError);
@@ -69,6 +70,7 @@ export default function App() {
     language: 'en' | 'zh',
   ) {
     setOptimizing(orderId, compCode, true);
+    setOptimizingLanguage(orderId, compCode, language);
     try {
       const text = await optimizeSingleLanguage({
         apiKey: settings.apiKey,
@@ -82,6 +84,7 @@ export default function App() {
       setOptimizeError(orderId, compCode, err instanceof Error ? err.message : String(err));
     } finally {
       setOptimizing(orderId, compCode, false);
+      setOptimizingLanguage(orderId, compCode, null);
     }
   }
 
@@ -349,6 +352,7 @@ export default function App() {
                     prompt={assembledPrompt.prompt}
                     optimized={assembledPrompt.optimized}
                     optimizing={assembledPrompt.optimizing}
+                    optimizingLanguage={assembledPrompt.optimizingLanguage}
                     optimizeError={assembledPrompt.optimizeError}
                     isConfigured={isConfigured(settings)}
                     onOptimize={() =>
