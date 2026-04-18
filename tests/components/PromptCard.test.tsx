@@ -88,18 +88,20 @@ describe('PromptCard', () => {
   it('shows a confirm dialog and only calls onOptimize when confirmed', async () => {
     const user = userEvent.setup();
     const onOptimize = vi.fn();
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
     render(
       <PromptCard {...baseProps} optimized={{ en: 'EN', zh: 'ZH' }} onOptimize={onOptimize} />,
     );
-    await user.click(screen.getByRole('button', { name: /^AI 優化$/ }));
-    expect(confirmSpy).toHaveBeenCalled();
-    expect(onOptimize).not.toHaveBeenCalled();
 
-    confirmSpy.mockReturnValue(true);
     await user.click(screen.getByRole('button', { name: /^AI 優化$/ }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '取消' }));
+    expect(onOptimize).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^AI 優化$/ }));
+    await user.click(screen.getByRole('button', { name: '確認覆蓋' }));
     expect(onOptimize).toHaveBeenCalledTimes(1);
-    confirmSpy.mockRestore();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('Enter key on the 原始提示詞 header toggles the section', async () => {

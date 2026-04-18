@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { checkLengthStatus, countWords } from '@/lib/tokenCount';
 import type { OptimizedPrompt, Tier } from '@/types';
 
@@ -45,6 +46,7 @@ export function PromptCard({
     en: false,
     zh: false,
   });
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (optimized) {
@@ -58,11 +60,14 @@ export function PromptCard({
 
   function handleOptimizeClick() {
     if (optimized) {
-      const ok = window.confirm('已有優化結果，重新優化會覆蓋舊結果，是否繼續？');
-      if (!ok) {
-        return;
-      }
+      setConfirmOpen(true);
+      return;
     }
+    onOptimize();
+  }
+
+  function handleConfirmOverwrite() {
+    setConfirmOpen(false);
     onOptimize();
   }
 
@@ -133,6 +138,15 @@ export function PromptCard({
           />
         </>
       )}
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="重新優化"
+        message="已有優化結果，重新優化會覆蓋舊結果，是否繼續？"
+        confirmLabel="確認覆蓋"
+        onConfirm={handleConfirmOverwrite}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }
