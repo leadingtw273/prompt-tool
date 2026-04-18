@@ -1,4 +1,4 @@
-import type { OptimizedPrompt } from '@/types';
+import type { AppSettings, OptimizedPrompt } from '@/types';
 
 const FORMAT_INSTRUCTION =
   'Return ONLY a JSON object with two keys: "en" (the optimized English prompt) ' +
@@ -7,7 +7,7 @@ const FORMAT_INSTRUCTION =
 
 interface OptimizeParams {
   apiKey: string;
-  model: 'gemini-2.5-flash' | 'gemini-2.5-pro';
+  model: AppSettings['model'];
   systemPrompt: string;
   originalPrompt: string;
 }

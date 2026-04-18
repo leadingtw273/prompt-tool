@@ -8,9 +8,16 @@ export const DEFAULT_SYSTEM_PROMPT =
   'while preserving the original composition, character, outfit, scene, pose, ' +
   'and expression intent. Avoid adding content that changes the subject.';
 
+export const SUPPORTED_MODELS = [
+  'gemini-3-flash',
+  'gemini-3.1-pro',
+  'gemini-2.5-flash',
+  'gemini-2.5-pro',
+] as const satisfies readonly AppSettings['model'][];
+
 const DEFAULT_SETTINGS: AppSettings = {
   apiKey: '',
-  model: 'gemini-2.5-flash',
+  model: 'gemini-3-flash',
   systemPrompt: DEFAULT_SYSTEM_PROMPT,
 };
 
@@ -23,10 +30,9 @@ export function loadSettings(): AppSettings {
     const parsed = JSON.parse(raw) as Partial<AppSettings>;
     return {
       apiKey: typeof parsed.apiKey === 'string' ? parsed.apiKey : DEFAULT_SETTINGS.apiKey,
-      model:
-        parsed.model === 'gemini-2.5-pro' || parsed.model === 'gemini-2.5-flash'
-          ? parsed.model
-          : DEFAULT_SETTINGS.model,
+      model: (SUPPORTED_MODELS as readonly string[]).includes(parsed.model ?? '')
+        ? (parsed.model as AppSettings['model'])
+        : DEFAULT_SETTINGS.model,
       systemPrompt:
         typeof parsed.systemPrompt === 'string' && parsed.systemPrompt.length > 0
           ? parsed.systemPrompt

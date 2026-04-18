@@ -10,7 +10,7 @@ interface Props {
 
 export function SettingsModal({ open, onClose, onSaved }: Props) {
   const [apiKey, setApiKey] = useState('');
-  const [model, setModel] = useState<AppSettings['model']>('gemini-2.5-flash');
+  const [model, setModel] = useState<AppSettings['model']>('gemini-3-flash');
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
   const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -104,7 +104,9 @@ export function SettingsModal({ open, onClose, onSaved }: Props) {
             className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none"
             aria-label="Model"
           >
-            <option value="gemini-2.5-flash">gemini-2.5-flash（推薦）</option>
+            <option value="gemini-3-flash">gemini-3-flash（推薦）</option>
+            <option value="gemini-3.1-pro">gemini-3.1-pro</option>
+            <option value="gemini-2.5-flash">gemini-2.5-flash</option>
             <option value="gemini-2.5-pro">gemini-2.5-pro</option>
           </select>
         </label>

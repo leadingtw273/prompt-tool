@@ -136,6 +136,6 @@ export interface AssembledPrompt {
 
 export interface AppSettings {
   apiKey: string;
-  model: 'gemini-2.5-flash' | 'gemini-2.5-pro';
+  model: 'gemini-3-flash' | 'gemini-3.1-pro' | 'gemini-2.5-flash' | 'gemini-2.5-pro';
   systemPrompt: string;
 }

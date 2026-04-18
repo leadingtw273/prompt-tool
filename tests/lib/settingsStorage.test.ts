@@ -16,7 +16,7 @@ describe('settingsStorage', () => {
     it('returns defaults when localStorage is empty', () => {
       const s = loadSettings();
       expect(s.apiKey).toBe('');
-      expect(s.model).toBe('gemini-2.5-flash');
+      expect(s.model).toBe('gemini-3-flash');
       expect(s.systemPrompt).toBe(DEFAULT_SYSTEM_PROMPT);
     });
 
@@ -24,7 +24,7 @@ describe('settingsStorage', () => {
       localStorage.setItem(STORAGE_KEY, '{not json');
       const s = loadSettings();
       expect(s.apiKey).toBe('');
-      expect(s.model).toBe('gemini-2.5-flash');
+      expect(s.model).toBe('gemini-3-flash');
     });
 
     it('fills missing fields with defaults', () => {
@@ -34,7 +34,7 @@ describe('settingsStorage', () => {
       );
       const s = loadSettings();
       expect(s.apiKey).toBe('abc');
-      expect(s.model).toBe('gemini-2.5-flash');
+      expect(s.model).toBe('gemini-3-flash');
       expect(s.systemPrompt).toBe(DEFAULT_SYSTEM_PROMPT);
     });
   });
