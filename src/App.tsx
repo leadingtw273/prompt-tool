@@ -4,7 +4,6 @@ import { ExportButton } from '@/components/ExportButton';
 import { OrderInput } from '@/components/OrderInput';
 import { PromptCard } from '@/components/PromptCard';
 import { SettingsModal } from '@/components/SettingsModal';
-import { recommendComps } from '@/lib/compRecommender';
 import {
   loadCharacter,
   loadCompositions,
@@ -108,10 +107,8 @@ export default function App() {
     setAssembledPrompts([]);
 
     for (const order of orders) {
-      const recommended = recommendComps({ pool: compositions, n: 5 });
-
       setCompSelection(order.id, {
-        recommendedCompCodes: recommended.map((composition) => composition.code),
+        recommendedCompCodes: compositions.map((composition) => composition.code),
         selectedCompCodes: [],
       });
     }

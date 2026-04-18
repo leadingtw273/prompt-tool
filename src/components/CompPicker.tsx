@@ -22,6 +22,8 @@ export function CompPicker({ recommended, selected, onChange }: Props) {
       options={options}
       value={value}
       onChange={(next: MultiValue<Option>) => onChange(next.map((o) => o.value))}
+      closeMenuOnSelect={false}
+      hideSelectedOptions={false}
       placeholder="選擇構圖…"
       noOptionsMessage={() => '無可用構圖'}
       aria-label="構圖挑選"
