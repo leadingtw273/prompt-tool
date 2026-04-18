@@ -119,9 +119,23 @@ export interface CompSelection {
   recommendedCompCodes: string[];
 }
 
+export interface OptimizedPrompt {
+  en: string;
+  zh: string;
+}
+
 export interface AssembledPrompt {
   orderId: string;
   compCode: string;
   prompt: string;
   estimatedWords: number;
+  optimized?: OptimizedPrompt;
+  optimizing?: boolean;
+  optimizeError?: string;
+}
+
+export interface AppSettings {
+  apiKey: string;
+  model: 'gemini-2.5-flash' | 'gemini-2.5-pro';
+  systemPrompt: string;
 }
