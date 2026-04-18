@@ -269,6 +269,7 @@ export default function App() {
                   return null;
                 }
 
+                // `recommended` 源自 store（commit a46774f 起實際為全部 compositions，名稱 stale）；`recommendedCodes` 為 pose 建議子集，兩者獨立。
                 const recommended = compositions.filter((composition) =>
                   selection.recommendedCompCodes.includes(composition.code),
                 );
