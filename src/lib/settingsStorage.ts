@@ -1,6 +1,6 @@
 import type { AppSettings } from '@/types';
 
-const STORAGE_KEY = 'prompt-tool:settings';
+export const STORAGE_KEY = 'prompt-tool:settings';
 
 export const DEFAULT_SYSTEM_PROMPT =
   'You are a professional prompt engineer specialized in AI image generation. ' +

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   DEFAULT_SYSTEM_PROMPT,
+  STORAGE_KEY,
   isConfigured,
   loadSettings,
   saveSettings,
@@ -20,7 +21,7 @@ describe('settingsStorage', () => {
     });
 
     it('returns defaults when stored JSON is invalid', () => {
-      localStorage.setItem('prompt-tool:settings', '{not json');
+      localStorage.setItem(STORAGE_KEY, '{not json');
       const s = loadSettings();
       expect(s.apiKey).toBe('');
       expect(s.model).toBe('gemini-2.5-flash');
@@ -28,7 +29,7 @@ describe('settingsStorage', () => {
 
     it('fills missing fields with defaults', () => {
       localStorage.setItem(
-        'prompt-tool:settings',
+        STORAGE_KEY,
         JSON.stringify({ apiKey: 'abc' }),
       );
       const s = loadSettings();
