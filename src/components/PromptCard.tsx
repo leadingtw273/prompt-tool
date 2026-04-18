@@ -50,8 +50,6 @@ export function PromptCard({
     en: false,
     zh: false,
   });
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
   useEffect(() => {
     if (optimized) {
       setExpanded({ original: false, en: true, zh: true });
@@ -62,26 +60,13 @@ export function PromptCard({
     setExpanded((prev) => ({ ...prev, [section]: !prev[section] }));
   }
 
-  function handleOptimizeClick() {
-    if (optimized) {
-      setConfirmOpen(true);
-      return;
-    }
-    onOptimize();
-  }
-
-  function handleConfirmOverwrite() {
-    setConfirmOpen(false);
-    onOptimize();
-  }
-
+  const optimizeDone = Boolean(optimized) && !optimizing;
   const optimizeLabel = !isConfigured
     ? 'AI 優化(未配置)'
     : optimizing
       ? '優化中…'
       : 'AI 優化';
-  const optimizeDisabled = !isConfigured || optimizing;
-  const optimizeDone = Boolean(optimized) && !optimizing;
+  const optimizeDisabled = !isConfigured || optimizing || optimizeDone;
   const optimizeBtnClass = optimizeDone
     ? 'bg-emerald-600 hover:bg-emerald-500'
     : 'bg-blue-600 hover:bg-blue-500';
@@ -100,9 +85,9 @@ export function PromptCard({
         </div>
         <button
           type="button"
-          onClick={handleOptimizeClick}
+          onClick={onOptimize}
           disabled={optimizeDisabled}
-          className={`inline-flex shrink-0 items-center gap-1.5 rounded px-4 py-2 text-sm font-medium text-white disabled:opacity-50 ${optimizeBtnClass}`}
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-70 ${optimizeBtnClass}`}
         >
           {optimizeDone && (
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -150,15 +135,6 @@ export function PromptCard({
           />
         </>
       )}
-
-      <ConfirmDialog
-        open={confirmOpen}
-        title="重新優化"
-        message="已有優化結果，重新優化會覆蓋舊結果，是否繼續？"
-        confirmLabel="確認覆蓋"
-        onConfirm={handleConfirmOverwrite}
-        onCancel={() => setConfirmOpen(false)}
-      />
     </div>
   );
 }

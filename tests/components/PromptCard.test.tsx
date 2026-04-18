@@ -85,22 +85,16 @@ describe('PromptCard', () => {
     expect(onOptimize).toHaveBeenCalledTimes(1);
   });
 
-  it('shows a confirm dialog and only calls onOptimize when confirmed', async () => {
+  it('disables the top AI button once optimized result exists', async () => {
     const user = userEvent.setup();
     const onOptimize = vi.fn();
     render(
       <PromptCard {...baseProps} optimized={{ en: 'EN', zh: 'ZH' }} onOptimize={onOptimize} />,
     );
-
-    await user.click(screen.getByRole('button', { name: /^AI 優化$/ }));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '取消' }));
+    const btn = screen.getByRole('button', { name: /^AI 優化$/ });
+    expect(btn).toBeDisabled();
+    await user.click(btn);
     expect(onOptimize).not.toHaveBeenCalled();
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: /^AI 優化$/ }));
-    await user.click(screen.getByRole('button', { name: '確認覆蓋' }));
-    expect(onOptimize).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
