@@ -174,6 +174,9 @@ describe('PromptCard', () => {
     expect(copyButtons[1]).toBeDisabled();
     expect(copyButtons[0]).not.toBeDisabled();
     expect(copyButtons[2]).not.toBeDisabled();
+    // Length-status tag hidden on refreshing section; original & ZH still show it
+    const statusTags = screen.getAllByTestId('length-status');
+    expect(statusTags).toHaveLength(2);
   });
 
   it('refresh icon does not appear on the original section', () => {

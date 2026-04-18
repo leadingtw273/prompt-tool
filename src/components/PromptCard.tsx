@@ -242,12 +242,14 @@ function CollapsibleSection({
           </button>
         )}
         <div className="flex-1" />
-        <span
-          data-testid="length-status"
-          className={`rounded px-2 py-1 text-xs ${statusClass}`}
-        >
-          {wordCount} 字 · {STATUS_LABEL[status]}
-        </span>
+        {!refreshing && (
+          <span
+            data-testid="length-status"
+            className={`rounded px-2 py-1 text-xs ${statusClass}`}
+          >
+            {wordCount} 字 · {STATUS_LABEL[status]}
+          </span>
+        )}
         <button
           type="button"
           onClick={handleCopy}
