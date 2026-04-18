@@ -151,7 +151,7 @@ describe('PromptCard', () => {
     expect(onRefresh).toHaveBeenCalledWith('zh');
   });
 
-  it('masks section content with spinner and disables refresh when optimizingLanguage matches', () => {
+  it('masks section content with spinner and disables refresh + copy when optimizingLanguage matches', () => {
     render(
       <PromptCard
         {...baseProps}
@@ -168,6 +168,12 @@ describe('PromptCard', () => {
     // Both refresh buttons disabled (global optimizing=true)
     const refreshButtons = screen.getAllByRole('button', { name: '重新生成' });
     refreshButtons.forEach((b) => expect(b).toBeDisabled());
+    // EN section's copy button disabled; other copy buttons still enabled
+    const copyButtons = screen.getAllByRole('button', { name: /複製/ });
+    // Sections order: original, EN, ZH => 3 copy buttons
+    expect(copyButtons[1]).toBeDisabled();
+    expect(copyButtons[0]).not.toBeDisabled();
+    expect(copyButtons[2]).not.toBeDisabled();
   });
 
   it('refresh icon does not appear on the original section', () => {

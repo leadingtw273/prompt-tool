@@ -251,9 +251,10 @@ function CollapsibleSection({
         <button
           type="button"
           onClick={handleCopy}
+          disabled={refreshing}
           aria-label={copied ? '已複製' : '複製'}
           title={copied ? '已複製' : '複製'}
-          className="rounded p-1.5 text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+          className="rounded p-1.5 text-slate-300 hover:bg-slate-800 hover:text-slate-100 disabled:opacity-50 disabled:hover:bg-transparent"
         >
           {copied ? (
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
