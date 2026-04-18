@@ -9,7 +9,12 @@ interface Props {
   onOrderChange: (order: Omit<Order, 'id'>) => void;
 }
 
-const TIERS: Tier[] = ['T0', 'T1'];
+const TIER_OPTIONS: { code: Tier; label: string }[] = [
+  { code: 'T0', label: 'T0 — 公域安全（IG / FB / Threads）' },
+  { code: 'T1', label: 'T1 — 微擦邊（X / 私域訂閱）' },
+  { code: 'T2', label: 'T2 — 私域訂閱（Fanvue / MyFans / Fansly）' },
+  { code: 'T3', label: 'T3 — PPV 加購（單次付費）' },
+];
 
 function formatCodes(o: Pick<Omit<Order, 'id'>, 'outfit' | 'scene' | 'pose' | 'expr'>): string {
   return `${o.outfit}_${o.scene}_${o.pose}_${o.expr}`;
@@ -132,7 +137,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
           id="tier"
           label="分級"
           value={current.tier}
-          options={TIERS.map((t) => ({ code: t, name: t }))}
+          options={TIER_OPTIONS.map((t) => ({ code: t.code, name: t.label, label: t.label }))}
           onChange={(v) => handleFieldChange({ tier: v as Tier })}
         />
         <div>
@@ -157,7 +162,7 @@ interface SelectFieldProps {
   id: string;
   label: string;
   value: string;
-  options: { code: string; name: string }[];
+  options: { code: string; name: string; label?: string }[];
   onChange: (v: string) => void;
 }
 
@@ -175,7 +180,7 @@ function SelectField({ id, label, value, options, onChange }: SelectFieldProps) 
       >
         {options.map((o) => (
           <option key={o.code} value={o.code} className="bg-slate-800 text-slate-100">
-            {o.code} - {o.name}
+            {o.label ?? `${o.code} - ${o.name}`}
           </option>
         ))}
       </select>
