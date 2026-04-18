@@ -134,6 +134,42 @@ describe('useOrderStore', () => {
       expect(result.current.assembledPrompts[0].optimizeError).toBeUndefined();
     });
 
+    it('setOptimizedField updates only the target language and clears error', () => {
+      const { result } = renderHook(() => useOrderStore());
+      act(() => {
+        result.current.setAssembledPrompts([
+          {
+            orderId: 'o1',
+            compCode: 'COMP-01',
+            prompt: 'p',
+            estimatedWords: 1,
+            optimized: { en: 'old EN', zh: 'old ZH' },
+            optimizeError: 'stale',
+          },
+        ]);
+        result.current.setOptimizedField('o1', 'COMP-01', 'zh', 'new ZH');
+      });
+      expect(result.current.assembledPrompts[0].optimized).toEqual({
+        en: 'old EN',
+        zh: 'new ZH',
+      });
+      expect(result.current.assembledPrompts[0].optimizeError).toBeUndefined();
+    });
+
+    it('setOptimizedField initializes optimized when previously undefined', () => {
+      const { result } = renderHook(() => useOrderStore());
+      act(() => {
+        result.current.setAssembledPrompts([
+          { orderId: 'o1', compCode: 'COMP-01', prompt: 'p', estimatedWords: 1 },
+        ]);
+        result.current.setOptimizedField('o1', 'COMP-01', 'en', 'fresh EN');
+      });
+      expect(result.current.assembledPrompts[0].optimized).toEqual({
+        en: 'fresh EN',
+        zh: '',
+      });
+    });
+
     it('setOptimizeError stores error and clears previous result', () => {
       const { result } = renderHook(() => useOrderStore());
       act(() => {

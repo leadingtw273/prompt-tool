@@ -124,4 +124,43 @@ describe('PromptCard', () => {
     expect(screen.getByText('NEW_EN')).toBeVisible();
     expect(screen.getByText('NEW_ZH')).toBeVisible();
   });
+
+  it('refresh icon on EN/ZH sections triggers confirm then calls onRefreshLanguage with the correct language', async () => {
+    const user = userEvent.setup();
+    const onRefresh = vi.fn();
+    render(
+      <PromptCard
+        {...baseProps}
+        optimized={{ en: 'EN', zh: 'ZH' }}
+        onRefreshLanguage={onRefresh}
+      />,
+    );
+
+    const refreshButtons = screen.getAllByRole('button', { name: '重新生成' });
+    expect(refreshButtons).toHaveLength(2);
+
+    await user.click(refreshButtons[0]);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '取消' }));
+    expect(onRefresh).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(refreshButtons[1]);
+    await user.click(screen.getByRole('button', { name: '確認覆蓋' }));
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+    expect(onRefresh).toHaveBeenCalledWith('zh');
+  });
+
+  it('refresh icon does not appear on the original section', () => {
+    render(
+      <PromptCard
+        {...baseProps}
+        optimized={{ en: 'EN', zh: 'ZH' }}
+        onRefreshLanguage={vi.fn()}
+      />,
+    );
+    // Only EN and ZH sections should have refresh buttons, not the original
+    const refreshButtons = screen.getAllByRole('button', { name: '重新生成' });
+    expect(refreshButtons).toHaveLength(2);
+  });
 });

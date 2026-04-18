@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { optimizePrompt } from '@/lib/aiOptimize';
+import { optimizePrompt, optimizeSingleLanguage } from '@/lib/aiOptimize';
 
 function mockFetchOk(bodyText: string) {
   return vi.fn().mockResolvedValue({
@@ -113,5 +113,38 @@ describe('optimizePrompt', () => {
   it('throws "Gemini 回傳格式不符" when response body is JSON array', async () => {
     vi.stubGlobal('fetch', mockFetchOk('[1,2,3]'));
     await expect(optimizePrompt(baseParams)).rejects.toThrow('Gemini 回傳格式不符');
+  });
+});
+
+describe('optimizeSingleLanguage', () => {
+  it('returns plain text for a single-language response', async () => {
+    vi.stubGlobal('fetch', mockFetchOk('optimized EN text'));
+    const r = await optimizeSingleLanguage({ ...baseParams, language: 'en' });
+    expect(r).toBe('optimized EN text');
+  });
+
+  it('strips code fences from single-language response', async () => {
+    vi.stubGlobal('fetch', mockFetchOk('```\noptimized ZH text\n```'));
+    const r = await optimizeSingleLanguage({ ...baseParams, language: 'zh' });
+    expect(r).toBe('optimized ZH text');
+  });
+
+  it('uses text/plain responseMimeType and language-specific FORMAT_INSTRUCTION', async () => {
+    const fetchMock = mockFetchOk('x');
+    vi.stubGlobal('fetch', fetchMock);
+    await optimizeSingleLanguage({ ...baseParams, language: 'zh' });
+    const [, init] = fetchMock.mock.calls[0];
+    const body = JSON.parse(init.body as string);
+    expect(body.generationConfig.responseMimeType).toBe('text/plain');
+    const text = body.contents[0].parts[0].text as string;
+    expect(text).toContain('Simplified Chinese');
+    expect(text).not.toContain('JSON object');
+  });
+
+  it('throws "Gemini 回傳格式不符" when single-language response is empty', async () => {
+    vi.stubGlobal('fetch', mockFetchOk('   '));
+    await expect(
+      optimizeSingleLanguage({ ...baseParams, language: 'en' }),
+    ).rejects.toThrow('Gemini 回傳格式不符');
   });
 });

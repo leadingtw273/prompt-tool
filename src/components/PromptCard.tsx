@@ -13,6 +13,7 @@ interface Props {
   optimizeError?: string;
   isConfigured: boolean;
   onOptimize: () => void;
+  onRefreshLanguage?: (language: 'en' | 'zh') => void;
 }
 
 const STATUS_LABEL: Record<'too_short' | 'ok' | 'too_long', string> = {
@@ -40,6 +41,7 @@ export function PromptCard({
   optimizeError,
   isConfigured,
   onOptimize,
+  onRefreshLanguage,
 }: Props) {
   const [expanded, setExpanded] = useState<Record<SectionKey, boolean>>({
     original: true,
@@ -129,12 +131,18 @@ export function PromptCard({
             content={optimized.en}
             expanded={expanded.en}
             onToggle={() => toggle('en')}
+            onRefresh={onRefreshLanguage ? () => onRefreshLanguage('en') : undefined}
+            refreshDisabled={optimizing}
+            refreshConfirmMessage="確認要重新生成英文優化提示詞？這會覆蓋目前的結果。"
           />
           <CollapsibleSection
             title="中文優化提示詞"
             content={optimized.zh}
             expanded={expanded.zh}
             onToggle={() => toggle('zh')}
+            onRefresh={onRefreshLanguage ? () => onRefreshLanguage('zh') : undefined}
+            refreshDisabled={optimizing}
+            refreshConfirmMessage="確認要重新生成中文優化提示詞？這會覆蓋目前的結果。"
           />
         </>
       )}
@@ -156,10 +164,22 @@ interface SectionProps {
   content: string;
   expanded: boolean;
   onToggle: () => void;
+  onRefresh?: () => void;
+  refreshDisabled?: boolean;
+  refreshConfirmMessage?: string;
 }
 
-function CollapsibleSection({ title, content, expanded, onToggle }: SectionProps) {
+function CollapsibleSection({
+  title,
+  content,
+  expanded,
+  onToggle,
+  onRefresh,
+  refreshDisabled,
+  refreshConfirmMessage,
+}: SectionProps) {
   const [copied, setCopied] = useState(false);
+  const [refreshConfirmOpen, setRefreshConfirmOpen] = useState(false);
   const wordCount = countWords(content);
   const status = checkLengthStatus(wordCount);
   const statusClass =
@@ -219,11 +239,44 @@ function CollapsibleSection({ title, content, expanded, onToggle }: SectionProps
             </svg>
           )}
         </button>
+        {onRefresh && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setRefreshConfirmOpen(true);
+            }}
+            disabled={refreshDisabled}
+            aria-label="重新生成"
+            title="重新生成"
+            className="rounded p-1.5 text-slate-300 hover:bg-slate-800 hover:text-slate-100 disabled:opacity-50 disabled:hover:bg-transparent"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 2v6h-6" />
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+              <path d="M3 22v-6h6" />
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+            </svg>
+          </button>
+        )}
       </div>
       {expanded && (
         <pre className="whitespace-pre-wrap border-t border-slate-800 bg-slate-950 px-3 py-2 font-mono text-sm text-slate-200">
           {content}
         </pre>
+      )}
+      {onRefresh && (
+        <ConfirmDialog
+          open={refreshConfirmOpen}
+          title="重新生成"
+          message={refreshConfirmMessage ?? '確認要重新生成？這會覆蓋目前的結果。'}
+          confirmLabel="確認覆蓋"
+          onConfirm={() => {
+            setRefreshConfirmOpen(false);
+            onRefresh();
+          }}
+          onCancel={() => setRefreshConfirmOpen(false)}
+        />
       )}
     </div>
   );

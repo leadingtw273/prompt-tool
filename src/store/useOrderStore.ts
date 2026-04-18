@@ -17,6 +17,12 @@ interface OrderStoreActions {
   setAssembledPrompts: (prompts: AssembledPrompt[]) => void;
   setOptimizing: (orderId: string, compCode: string, optimizing: boolean) => void;
   setOptimizedResult: (orderId: string, compCode: string, result: OptimizedPrompt) => void;
+  setOptimizedField: (
+    orderId: string,
+    compCode: string,
+    language: 'en' | 'zh',
+    text: string,
+  ) => void;
   setOptimizeError: (orderId: string, compCode: string, error: string) => void;
   reset: () => void;
 }
@@ -101,6 +107,22 @@ export const useOrderStore = create<OrderStoreState & OrderStoreActions>((set) =
           ? { ...p, optimized: result, optimizeError: undefined }
           : p,
       ),
+    }));
+  },
+
+  setOptimizedField: (orderId, compCode, language, text) => {
+    set((s) => ({
+      assembledPrompts: s.assembledPrompts.map((p) => {
+        if (p.orderId !== orderId || p.compCode !== compCode) {
+          return p;
+        }
+        const base: OptimizedPrompt = p.optimized ?? { en: '', zh: '' };
+        return {
+          ...p,
+          optimized: { ...base, [language]: text },
+          optimizeError: undefined,
+        };
+      }),
     }));
   },
 

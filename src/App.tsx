@@ -18,7 +18,7 @@ import {
   loadTierConstraints,
 } from '@/lib/dataLoader';
 import { assemblePrompt } from '@/lib/promptAssembler';
-import { optimizePrompt } from '@/lib/aiOptimize';
+import { optimizePrompt, optimizeSingleLanguage } from '@/lib/aiOptimize';
 import { isConfigured, loadSettings } from '@/lib/settingsStorage';
 import { countWords } from '@/lib/tokenCount';
 import { useOrderStore } from '@/store/useOrderStore';
@@ -39,6 +39,7 @@ export default function App() {
 
   const setOptimizing = useOrderStore((state) => state.setOptimizing);
   const setOptimizedResult = useOrderStore((state) => state.setOptimizedResult);
+  const setOptimizedField = useOrderStore((state) => state.setOptimizedField);
   const setOptimizeError = useOrderStore((state) => state.setOptimizeError);
 
   const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
@@ -54,6 +55,29 @@ export default function App() {
         originalPrompt: prompt,
       });
       setOptimizedResult(orderId, compCode, result);
+    } catch (err) {
+      setOptimizeError(orderId, compCode, err instanceof Error ? err.message : String(err));
+    } finally {
+      setOptimizing(orderId, compCode, false);
+    }
+  }
+
+  async function handleRefreshLanguage(
+    orderId: string,
+    compCode: string,
+    prompt: string,
+    language: 'en' | 'zh',
+  ) {
+    setOptimizing(orderId, compCode, true);
+    try {
+      const text = await optimizeSingleLanguage({
+        apiKey: settings.apiKey,
+        model: settings.model,
+        systemPrompt: settings.systemPrompt,
+        originalPrompt: prompt,
+        language,
+      });
+      setOptimizedField(orderId, compCode, language, text);
     } catch (err) {
       setOptimizeError(orderId, compCode, err instanceof Error ? err.message : String(err));
     } finally {
@@ -332,6 +356,14 @@ export default function App() {
                         assembledPrompt.orderId,
                         assembledPrompt.compCode,
                         assembledPrompt.prompt,
+                      )
+                    }
+                    onRefreshLanguage={(language) =>
+                      handleRefreshLanguage(
+                        assembledPrompt.orderId,
+                        assembledPrompt.compCode,
+                        assembledPrompt.prompt,
+                        language,
                       )
                     }
                   />

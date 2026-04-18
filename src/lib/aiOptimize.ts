@@ -1,9 +1,18 @@
 import type { AppSettings, OptimizedPrompt } from '@/types';
 
-const FORMAT_INSTRUCTION =
+const FORMAT_INSTRUCTION_BOTH =
   'Return ONLY a JSON object with two keys: "en" (the optimized English prompt) ' +
   'and "zh" (the optimized prompt in Simplified Chinese). ' +
   'Do not include markdown code fences, explanations, or any other text.';
+
+const FORMAT_INSTRUCTION_SINGLE: Record<'en' | 'zh', string> = {
+  en:
+    'Return ONLY the optimized English prompt as plain text. ' +
+    'Do not include markdown code fences, explanations, or any other text.',
+  zh:
+    'Return ONLY the optimized prompt in Simplified Chinese as plain text. ' +
+    'Do not include markdown code fences, explanations, or any other text.',
+};
 
 interface OptimizeParams {
   apiKey: string;
@@ -20,8 +29,44 @@ const MODEL_API_CODE: Record<AppSettings['model'], string> = {
 };
 
 export async function optimizePrompt(params: OptimizeParams): Promise<OptimizedPrompt> {
+  const text = await callGemini(params, FORMAT_INSTRUCTION_BOTH, 'application/json');
+  const stripped = stripCodeFence(text);
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(stripped);
+  } catch {
+    throw new Error('回傳格式解析失敗');
+  }
+
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Gemini 回傳格式不符');
+  }
+  const obj = parsed as { en?: unknown; zh?: unknown };
+  if (typeof obj.en !== 'string' || typeof obj.zh !== 'string' || !obj.en || !obj.zh) {
+    throw new Error('Gemini 回傳格式不符');
+  }
+  return { en: obj.en, zh: obj.zh };
+}
+
+export async function optimizeSingleLanguage(
+  params: OptimizeParams & { language: 'en' | 'zh' },
+): Promise<string> {
+  const text = await callGemini(params, FORMAT_INSTRUCTION_SINGLE[params.language], 'text/plain');
+  const stripped = stripCodeFence(text).trim();
+  if (!stripped) {
+    throw new Error('Gemini 回傳格式不符');
+  }
+  return stripped;
+}
+
+async function callGemini(
+  params: OptimizeParams,
+  formatInstruction: string,
+  responseMimeType: 'application/json' | 'text/plain',
+): Promise<string> {
   const { apiKey, model, systemPrompt, originalPrompt } = params;
-  const userText = `${systemPrompt}\n\n${FORMAT_INSTRUCTION}\n\n---\n\n${originalPrompt}`;
+  const userText = `${systemPrompt}\n\n${formatInstruction}\n\n---\n\n${originalPrompt}`;
   const apiModel = MODEL_API_CODE[model];
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${encodeURIComponent(
@@ -37,7 +82,7 @@ export async function optimizePrompt(params: OptimizeParams): Promise<OptimizedP
         contents: [{ role: 'user', parts: [{ text: userText }] }],
         generationConfig: {
           temperature: 0.8,
-          responseMimeType: 'application/json',
+          responseMimeType,
         },
       }),
     });
@@ -63,24 +108,7 @@ export async function optimizePrompt(params: OptimizeParams): Promise<OptimizedP
   const payload = (await response.json()) as {
     candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
   };
-  const text = payload.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-  const stripped = stripCodeFence(text);
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(stripped);
-  } catch {
-    throw new Error('回傳格式解析失敗');
-  }
-
-  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('Gemini 回傳格式不符');
-  }
-  const obj = parsed as { en?: unknown; zh?: unknown };
-  if (typeof obj.en !== 'string' || typeof obj.zh !== 'string' || !obj.en || !obj.zh) {
-    throw new Error('Gemini 回傳格式不符');
-  }
-  return { en: obj.en, zh: obj.zh };
+  return payload.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 }
 
 function stripCodeFence(text: string): string {
