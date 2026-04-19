@@ -51,6 +51,7 @@ export function DataManagerModal({ open, onClose }: Props) {
     compositions: compositions.length,
     characters: Object.keys(charactersById).length,
   };
+  const hasEmpty = ENTITY_KINDS.some((kind) => counts[kind] === 0);
 
   function handleExport(kind: EntityKind) {
     const meta = ENTITY_METADATA[kind];
@@ -145,7 +146,10 @@ export function DataManagerModal({ open, onClose }: Props) {
             </tbody>
           </table>
 
-          <div className="flex justify-end">
+          <div className={`flex items-center ${hasEmpty ? 'justify-between' : 'justify-end'}`}>
+            {hasEmpty && (
+              <p className="text-sm italic text-yellow-400">資料不完整將無法新增工單</p>
+            )}
             <button
               type="button"
               onClick={onClose}
