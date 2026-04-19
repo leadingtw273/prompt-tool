@@ -15,11 +15,13 @@ interface Props {
 }
 
 export function CompPicker({ options, recommendedCodes, selected, onChange }: Props) {
-  const selectOptions: Option[] = options.map((c) => ({
-    value: c.code,
-    label: c.name,
-    isRecommended: recommendedCodes.includes(c.code),
-  }));
+  const selectOptions: Option[] = options
+    .map((c) => ({
+      value: c.code,
+      label: c.name,
+      isRecommended: recommendedCodes.includes(c.code),
+    }))
+    .sort((a, b) => Number(b.isRecommended) - Number(a.isRecommended));
   const value = selectOptions.filter((o) => selected.includes(o.value));
 
   return (

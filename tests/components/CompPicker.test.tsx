@@ -82,6 +82,22 @@ describe('CompPicker', () => {
     expect(lastCall).toContain('COMP-04');
   });
 
+  it('renders recommended options before non-recommended in dropdown order', async () => {
+    const user = userEvent.setup();
+    render(
+      <CompPicker
+        options={comps}
+        recommendedCodes={['COMP-04']}
+        selected={[]}
+        onChange={vi.fn()}
+      />,
+    );
+    await user.click(screen.getByRole('combobox'));
+    const listbox = await screen.findByRole('listbox');
+    const optionEls = within(listbox).getAllByRole('option');
+    expect(optionEls.map((o) => o.textContent)).toEqual(['⭐ 全身 3/4', '特寫正面']);
+  });
+
   it('renders a ⭐ prefix on options listed in recommendedCodes', async () => {
     const user = userEvent.setup();
     render(
