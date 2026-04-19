@@ -46,6 +46,7 @@ export default function App() {
         model: settings.model,
         systemPrompt: settings.systemPrompt,
         originalPrompt: prompt,
+        backgroundData: buildBackgroundData(orderId, compCode),
       });
       setOptimizedResult(orderId, compCode, result);
     } catch (err) {
@@ -70,6 +71,7 @@ export default function App() {
         systemPrompt: settings.systemPrompt,
         originalPrompt: prompt,
         language,
+        backgroundData: buildBackgroundData(orderId, compCode),
       });
       setOptimizedField(orderId, compCode, language, text);
     } catch (err) {
@@ -89,6 +91,37 @@ export default function App() {
   const activeCharacterId = useDataStore((s) => s.activeCharacterId);
   const character = activeCharacterId ? charactersById[activeCharacterId] : undefined;
   const tierConstraints = loadTierConstraints();
+
+  function buildBackgroundData(orderId: string, compCode: string): string | undefined {
+    const order = orders.find((o) => o.id === orderId);
+    if (!order || !character) return undefined;
+    const comp = compositions.find((c) => c.code === compCode);
+    const outfit = outfits.find((o) => o.code === order.outfit);
+    const scene = scenes.find((s) => s.code === order.scene);
+    const pose = poses.find((p) => p.code === order.pose);
+    const expression = expressions.find((e) => e.code === order.expr);
+    if (!comp || !outfit || !scene || !pose || !expression) return undefined;
+    return JSON.stringify(
+      {
+        character,
+        order: {
+          outfit: order.outfit,
+          scene: order.scene,
+          pose: order.pose,
+          expr: order.expr,
+          tier: order.tier,
+        },
+        composition: comp,
+        outfit,
+        scene,
+        pose,
+        expression,
+        tierConstraint: tierConstraints[order.tier],
+      },
+      null,
+      2,
+    );
+  }
 
   const canAddOrder =
     outfits.length > 0 &&

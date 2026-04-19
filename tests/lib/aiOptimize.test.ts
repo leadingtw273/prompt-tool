@@ -58,6 +58,37 @@ describe('optimizePrompt', () => {
     expect(text).toMatch(/JSON object/);
   });
 
+  it('injects backgroundData as a labeled context block when provided', async () => {
+    const fetchMock = mockFetchOk('{"en":"EN","zh":"ZH"}');
+    vi.stubGlobal('fetch', fetchMock);
+    const bg = JSON.stringify({ character: { character_id: 'ACC-001' } });
+    await optimizePrompt({ ...baseParams, backgroundData: bg });
+    const [, init] = fetchMock.mock.calls[0];
+    const body = JSON.parse(init.body as string);
+    const text = body.contents[0].parts[0].text as string;
+    expect(text).toContain('Context (source records');
+    expect(text).toContain('ACC-001');
+    expect(text).toContain('End of context');
+    // order: systemPrompt < formatInstruction < context < originalPrompt
+    const sysIdx = text.indexOf('SYSTEM');
+    const fmtIdx = text.indexOf('JSON object');
+    const ctxIdx = text.indexOf('Context (source records');
+    const origIdx = text.indexOf('ORIGINAL');
+    expect(sysIdx).toBeLessThan(fmtIdx);
+    expect(fmtIdx).toBeLessThan(ctxIdx);
+    expect(ctxIdx).toBeLessThan(origIdx);
+  });
+
+  it('omits the context block when backgroundData is not provided', async () => {
+    const fetchMock = mockFetchOk('{"en":"EN","zh":"ZH"}');
+    vi.stubGlobal('fetch', fetchMock);
+    await optimizePrompt(baseParams);
+    const [, init] = fetchMock.mock.calls[0];
+    const body = JSON.parse(init.body as string);
+    const text = body.contents[0].parts[0].text as string;
+    expect(text).not.toContain('Context (source records');
+  });
+
   it('maps gemini-3-flash and gemini-3.1-pro to their -preview API codes in the URL', async () => {
     const fetchMock = mockFetchOk('{"en":"EN","zh":"ZH"}');
     vi.stubGlobal('fetch', fetchMock);
