@@ -35,12 +35,20 @@ export function CompPicker({ options, recommendedCodes, selected, onChange }: Pr
       placeholder="選擇構圖…"
       noOptionsMessage={() => '無可用構圖'}
       aria-label="構圖挑選"
-      formatOptionLabel={(opt: Option) => (
-        <span className={opt.isRecommended ? 'text-blue-400' : ''}>
-          {opt.isRecommended ? '⭐ ' : ''}
-          {opt.label}
-        </span>
-      )}
+      formatOptionLabel={(opt: Option, { context }) => {
+        const isSelectedMenuOption = context === 'menu' && selected.includes(opt.value);
+        const colorClass = opt.isRecommended
+          ? isSelectedMenuOption
+            ? 'text-white'
+            : 'text-blue-400'
+          : '';
+        return (
+          <span className={colorClass}>
+            {opt.isRecommended ? '⭐ ' : ''}
+            {opt.label}
+          </span>
+        );
+      }}
       unstyled
       classNames={{
         control: ({ isFocused }) =>
