@@ -95,6 +95,12 @@ export default function App() {
     scenes.length > 0 &&
     poses.length > 0 &&
     expressions.length > 0;
+  const hasIncompleteData =
+    outfits.length === 0 ||
+    scenes.length === 0 ||
+    poses.length === 0 ||
+    expressions.length === 0 ||
+    compositions.length === 0;
 
   function handleAddBlankOrder() {
     if (!canAddOrder) return;
@@ -208,14 +214,37 @@ export default function App() {
                 新增一筆或多筆工單，再推薦相容的構圖。
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleAddBlankOrder}
-              disabled={!canAddOrder}
-              className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-50"
-            >
-              + 新增工單
-            </button>
+            <div className="flex items-center gap-3">
+              {hasIncompleteData && (
+                <div className="flex items-center gap-1 text-sm italic text-yellow-400">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-label="無資料"
+                  >
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                  </svg>
+                  資料不完整將無法新增工單
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleAddBlankOrder}
+                disabled={!canAddOrder}
+                className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-50"
+              >
+                + 新增工單
+              </button>
+            </div>
           </div>
 
           <div className="mt-6 space-y-4">
