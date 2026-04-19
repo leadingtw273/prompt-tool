@@ -22,4 +22,12 @@ describe('serializeOutfitsCsv', () => {
       expect(parsed.items).toEqual(items);
     }
   });
+
+  it('round-trip cleans up whitespace-padded input values from parser side', () => {
+    const items = [{ code: 'O1', name: 'n1', prompt: 'p1' }];
+    const csv = serializeOutfitsCsv(items);
+    const parsed = parseOutfitsCsv(csv);
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) expect(parsed.items).toEqual(items);
+  });
 });

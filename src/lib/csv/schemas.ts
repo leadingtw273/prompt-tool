@@ -66,3 +66,6 @@ export const ANGLE_VALUES = [
   'high_down',
   'over_shoulder',
 ] as const;
+
+export type ShotValue = typeof SHOT_VALUES[number];
+export type AngleValue = typeof ANGLE_VALUES[number];

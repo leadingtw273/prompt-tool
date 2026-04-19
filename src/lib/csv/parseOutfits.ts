@@ -43,9 +43,9 @@ export function parseOutfitsCsv(csvText: string): ParseResult<Outfit> {
       codeLines.set(code, list);
     }
     items.push({
-      code: row.code?.trim() ?? '',
-      name: row.name ?? '',
-      prompt: row.prompt ?? '',
+      code,
+      name: row.name?.trim() ?? '',
+      prompt: row.prompt?.trim() ?? '',
     });
   });
 

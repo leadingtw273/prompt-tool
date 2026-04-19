@@ -53,6 +53,15 @@ describe('parseOutfitsCsv', () => {
     }
   });
 
+  it('rejects when required field is whitespace-only', () => {
+    const csv = 'code,name,prompt\nO1,   ,p1';
+    const result = parseOutfitsCsv(csv);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.some((e) => e.column === 'name')).toBe(true);
+    }
+  });
+
   it('rejects duplicate code with both line numbers', () => {
     const csv = 'code,name,prompt\nO1,n1,p1\nO2,n2,p2\nO1,n3,p3';
     const result = parseOutfitsCsv(csv);
