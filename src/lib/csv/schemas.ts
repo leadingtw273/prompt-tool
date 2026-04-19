@@ -67,5 +67,4 @@ export const ANGLE_VALUES = [
   'over_shoulder',
 ] as const;
 
-export type ShotValue = typeof SHOT_VALUES[number];
-export type AngleValue = typeof ANGLE_VALUES[number];
+export type { Angle, Shot } from '@/types';

@@ -1,13 +1,8 @@
 import Papa from 'papaparse';
 import type { Composition } from '@/types';
 import type { ParseError, ParseResult } from './types';
-import {
-  ANGLE_VALUES,
-  type AngleValue,
-  COMPOSITION_SCHEMA,
-  SHOT_VALUES,
-  type ShotValue,
-} from './schemas';
+import { ANGLE_VALUES, COMPOSITION_SCHEMA, SHOT_VALUES } from './schemas';
+import type { Angle, Shot } from '@/types';
 
 export function parseCompositionsCsv(csvText: string): ParseResult<Composition> {
   const errors: ParseError[] = [];
@@ -72,8 +67,8 @@ export function parseCompositionsCsv(csvText: string): ParseResult<Composition> 
       code,
       name: row.name?.trim() ?? '',
       prompt: row.prompt?.trim() ?? '',
-      shot: shot as ShotValue,
-      angle: angle as AngleValue,
+      shot: shot as Shot,
+      angle: angle as Angle,
     });
   });
 
