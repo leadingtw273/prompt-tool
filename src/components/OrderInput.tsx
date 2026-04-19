@@ -32,7 +32,6 @@ export function OrderInput({ value, onOrderChange }: Props) {
     pose: value?.pose ?? poses[0]?.code ?? '',
     expr: value?.expr ?? expressions[0]?.code ?? '',
     tier: value?.tier ?? ('T0' as Tier),
-    count: value?.count ?? 1,
   };
 
   // codesText 僅在 input 處於 focus 期間使用 local buffer；
@@ -132,28 +131,13 @@ export function OrderInput({ value, onOrderChange }: Props) {
 
       <div aria-hidden="true" className="my-6 border-t border-slate-700" />
 
-      <div className="grid grid-cols-2 gap-3">
-        <SelectField
-          id="tier"
-          label="分級"
-          value={current.tier}
-          options={TIER_OPTIONS.map((t) => ({ code: t.code, name: t.label, label: t.label }))}
-          onChange={(v) => handleFieldChange({ tier: v as Tier })}
-        />
-        <div>
-          <label htmlFor="count" className="block text-sm font-medium text-slate-200">
-            數量
-          </label>
-          <input
-            id="count"
-            type="number"
-            min={1}
-            value={current.count}
-            onChange={(e) => handleFieldChange({ count: Number(e.target.value) })}
-            className="mt-1 w-full rounded border border-slate-700 bg-slate-800 p-2 text-slate-100 focus:border-blue-500 focus:outline-none"
-          />
-        </div>
-      </div>
+      <SelectField
+        id="tier"
+        label="分級"
+        value={current.tier}
+        options={TIER_OPTIONS.map((t) => ({ code: t.code, name: t.label, label: t.label }))}
+        onChange={(v) => handleFieldChange({ tier: v as Tier })}
+      />
     </div>
   );
 }

@@ -18,7 +18,6 @@ describe('useOrderStore', () => {
             pose: 'POS-04',
             expr: 'EXP-01',
             tier: 'T0',
-            count: 4,
           });
         });
         expect(result.current.orders).toHaveLength(1);
@@ -28,8 +27,8 @@ describe('useOrderStore', () => {
   });
 
   describe('Given an existing order', () => {
-    describe('When updateOrder patches count', () => {
-      it('Then the order count is updated in-place', () => {
+    describe('When updateOrder patches tier', () => {
+      it('Then the order tier is updated in-place', () => {
         const { result } = renderHook(() => useOrderStore());
         let newId = '';
         act(() => {
@@ -39,13 +38,12 @@ describe('useOrderStore', () => {
             pose: 'POS-04',
             expr: 'EXP-01',
             tier: 'T0',
-            count: 4,
           });
         });
         act(() => {
-          result.current.updateOrder(newId, { count: 8 });
+          result.current.updateOrder(newId, { tier: 'T2' });
         });
-        expect(result.current.orders[0].count).toBe(8);
+        expect(result.current.orders[0].tier).toBe('T2');
       });
     });
 
@@ -60,7 +58,6 @@ describe('useOrderStore', () => {
             pose: 'POS-04',
             expr: 'EXP-01',
             tier: 'T0',
-            count: 4,
           });
         });
         act(() => {
@@ -85,7 +82,6 @@ describe('useOrderStore', () => {
             pose: 'POS-04',
             expr: 'EXP-01',
             tier: 'T0',
-            count: 4,
           });
           result.current.setCompSelection(id, {
             recommendedCompCodes: ['COMP-01', 'COMP-03'],

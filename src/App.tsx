@@ -110,7 +110,6 @@ export default function App() {
       pose: poses[0].code,
       expr: expressions[0].code,
       tier: 'T0',
-      count: 1,
     });
   }
 

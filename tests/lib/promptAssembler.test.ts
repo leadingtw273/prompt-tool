@@ -83,7 +83,7 @@ describe('promptAssembler', () => {
   describe('Given a complete set of inputs (CAS-02 + SCN-01 + POS-04 + EXP-01 + COMP-03 + T0)', () => {
     describe('When assemblePrompt is called', () => {
       const result = assemblePrompt({
-        order: { outfit: 'CAS-02', scene: 'SCN-01', pose: 'POS-04', expr: 'EXP-01', tier: 'T0', count: 4 },
+        order: { outfit: 'CAS-02', scene: 'SCN-01', pose: 'POS-04', expr: 'EXP-01', tier: 'T0' },
         comp,
         character,
         outfit,

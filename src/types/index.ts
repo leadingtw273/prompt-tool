@@ -88,7 +88,6 @@ export interface Order {
   pose: string;
   expr: string;
   tier: Tier;
-  count: number;
 }
 
 export interface CompSelection {

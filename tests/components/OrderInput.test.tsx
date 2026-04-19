@@ -158,7 +158,6 @@ describe('OrderInput', () => {
           pose: 'POS-04',
           expr: 'EXP-05',
           tier: 'T0' as const,
-          count: 1,
         };
         render(<OrderInput value={value} onOrderChange={onOrderChange} />);
 
@@ -171,14 +170,13 @@ describe('OrderInput', () => {
     });
 
     describe('The unified view', () => {
-      it('Then all select inputs and count input are rendered', () => {
+      it('Then all select inputs are rendered', () => {
         render(<OrderInput value={null} onOrderChange={vi.fn()} />);
         expect(screen.getByLabelText('服裝')).toBeInTheDocument();
         expect(screen.getByLabelText('場景')).toBeInTheDocument();
         expect(screen.getByLabelText('姿勢')).toBeInTheDocument();
         expect(screen.getByLabelText('表情')).toBeInTheDocument();
         expect(screen.getByLabelText('分級')).toBeInTheDocument();
-        expect(screen.getByLabelText('數量')).toBeInTheDocument();
       });
     });
   });
