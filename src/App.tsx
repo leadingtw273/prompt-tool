@@ -106,6 +106,7 @@ export default function App() {
   }
 
   function handleRecommend() {
+    if (compositions.length === 0) return;
     setGlobalError(null);
     setAssembledPrompts([]);
 
@@ -118,6 +119,7 @@ export default function App() {
   }
 
   function handleAssemble() {
+    if (!character) return;
     setGlobalError(null);
 
     const prompts: AssembledPrompt[] = [];
@@ -142,7 +144,7 @@ export default function App() {
         const prompt = assemblePrompt({
           order,
           comp: composition,
-          character: character!,
+          character,
           outfit,
           scene,
           pose,
@@ -250,7 +252,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleRecommend}
-              disabled={orders.length === 0}
+              disabled={orders.length === 0 || compositions.length === 0}
               className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
             >
               推薦構圖
