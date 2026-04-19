@@ -14,6 +14,10 @@ dist-ssr
 
 tmp/
 
+# user's private styles / characters data — kept locally, not in git
+src/data/styles/*.yaml
+src/data/characters/*.yaml
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

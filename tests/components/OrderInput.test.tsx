@@ -1,10 +1,48 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OrderInput } from '@/components/OrderInput';
-import type { Order } from '@/types';
+import { useDataStore } from '@/store/useDataStore';
+import type { Order, Outfit, Scene, Pose, Expression } from '@/types';
+
+const MOCK_OUTFITS: Outfit[] = [
+  { code: 'CAS-01', name: 'Casual 01', prompt: 'casual outfit 01' },
+  { code: 'CAS-02', name: 'Casual 02', prompt: 'casual outfit 02' },
+  { code: 'GRL-02', name: 'Girl 02', prompt: 'girl outfit 02' },
+];
+const MOCK_SCENES: Scene[] = [
+  { code: 'SCN-01', name: 'Scene 01', prompt: 'scene 01' },
+  { code: 'SCN-02', name: 'Scene 02', prompt: 'scene 02' },
+  { code: 'SCN-03', name: 'Scene 03', prompt: 'scene 03' },
+];
+const MOCK_POSES: Pose[] = [
+  { code: 'POS-01', name: 'Pose 01', prompt: 'pose 01', compatible_comps: [] },
+  { code: 'POS-04', name: 'Pose 04', prompt: 'pose 04', compatible_comps: [] },
+];
+const MOCK_EXPRESSIONS: Expression[] = [
+  { code: 'EXP-01', name: 'Expr 01', prompt: 'expr 01' },
+  { code: 'EXP-05', name: 'Expr 05', prompt: 'expr 05' },
+];
 
 describe('OrderInput', () => {
+  beforeEach(() => {
+    useDataStore.setState({
+      outfits: MOCK_OUTFITS,
+      scenes: MOCK_SCENES,
+      poses: MOCK_POSES,
+      expressions: MOCK_EXPRESSIONS,
+    });
+  });
+
+  afterEach(() => {
+    useDataStore.setState({
+      outfits: [],
+      scenes: [],
+      poses: [],
+      expressions: [],
+    });
+  });
+
   describe('Given default props', () => {
     describe('When valid codes are entered and blurred', () => {
       it('Then onOrderChange is called with a parsed Order', async () => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FocusEvent } from 'react';
 import { parseCodes } from '@/lib/orderParser';
-import { loadOutfits, loadScenes, loadPoses, loadExpressions } from '@/lib/dataLoader';
+import { useDataStore } from '@/store/useDataStore';
 import type { Order, Tier } from '@/types';
 
 interface Props {
@@ -21,16 +21,16 @@ function formatCodes(o: Pick<Omit<Order, 'id'>, 'outfit' | 'scene' | 'pose' | 'e
 }
 
 export function OrderInput({ value, onOrderChange }: Props) {
-  const outfits = loadOutfits();
-  const scenes = loadScenes();
-  const poses = loadPoses();
-  const expressions = loadExpressions();
+  const outfits = useDataStore((s) => s.outfits);
+  const scenes = useDataStore((s) => s.scenes);
+  const poses = useDataStore((s) => s.poses);
+  const expressions = useDataStore((s) => s.expressions);
 
   const current = {
-    outfit: value?.outfit ?? outfits[0].code,
-    scene: value?.scene ?? scenes[0].code,
-    pose: value?.pose ?? poses[0].code,
-    expr: value?.expr ?? expressions[0].code,
+    outfit: value?.outfit ?? outfits[0]?.code ?? '',
+    scene: value?.scene ?? scenes[0]?.code ?? '',
+    pose: value?.pose ?? poses[0]?.code ?? '',
+    expr: value?.expr ?? expressions[0]?.code ?? '',
     tier: value?.tier ?? ('T0' as Tier),
     count: value?.count ?? 1,
   };

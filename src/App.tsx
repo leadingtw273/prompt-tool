@@ -4,15 +4,8 @@ import { ExportButton } from '@/components/ExportButton';
 import { OrderInput } from '@/components/OrderInput';
 import { PromptCard } from '@/components/PromptCard';
 import { SettingsModal } from '@/components/SettingsModal';
-import {
-  loadCharacter,
-  loadCompositions,
-  loadExpressions,
-  loadOutfits,
-  loadPoses,
-  loadScenes,
-  loadTierConstraints,
-} from '@/lib/dataLoader';
+import { loadTierConstraints } from '@/lib/dataLoader';
+import { useDataStore } from '@/store/useDataStore';
 import { assemblePrompt } from '@/lib/promptAssembler';
 import { getRecommendedCompCodes } from '@/lib/compRecommendation';
 import { optimizePrompt, optimizeSingleLanguage } from '@/lib/aiOptimize';
@@ -84,15 +77,24 @@ export default function App() {
     }
   }
 
-  const character = loadCharacter('ACC-001');
-  const outfits = loadOutfits();
-  const scenes = loadScenes();
-  const poses = loadPoses();
-  const expressions = loadExpressions();
-  const compositions = loadCompositions();
+  const outfits = useDataStore((s) => s.outfits);
+  const scenes = useDataStore((s) => s.scenes);
+  const poses = useDataStore((s) => s.poses);
+  const expressions = useDataStore((s) => s.expressions);
+  const compositions = useDataStore((s) => s.compositions);
+  const charactersById = useDataStore((s) => s.charactersById);
+  const activeCharacterId = useDataStore((s) => s.activeCharacterId);
+  const character = activeCharacterId ? charactersById[activeCharacterId] : undefined;
   const tierConstraints = loadTierConstraints();
 
+  const canAddOrder =
+    outfits.length > 0 &&
+    scenes.length > 0 &&
+    poses.length > 0 &&
+    expressions.length > 0;
+
   function handleAddBlankOrder() {
+    if (!canAddOrder) return;
     addOrder({
       outfit: outfits[0].code,
       scene: scenes[0].code,
@@ -140,7 +142,7 @@ export default function App() {
         const prompt = assemblePrompt({
           order,
           comp: composition,
-          character,
+          character: character!,
           outfit,
           scene,
           pose,
@@ -158,6 +160,26 @@ export default function App() {
     }
 
     setAssembledPrompts(prompts);
+  }
+
+  if (!character) {
+    return (
+      <div className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100">
+        <div className="mx-auto max-w-5xl space-y-6">
+          <header className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h1 className="text-3xl font-bold text-slate-100">AI 虛擬網紅提示詞產生器</h1>
+            <p className="mt-2 text-sm text-slate-400">尚未匯入角色資料</p>
+          </header>
+          <section className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/60 p-6 text-sm text-slate-400">
+            資料層已就緒，但 UI 匯入介面尚未實作（Sub-plan B 才會加上）。目前可在 devtools 以
+            <code className="mx-1 rounded bg-slate-800 px-1 py-0.5 text-xs text-slate-200">
+              useDataStore.getState().importCharacters(...)
+            </code>
+            等方式手動注入資料進行驗證。
+          </section>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -195,7 +217,8 @@ export default function App() {
             <button
               type="button"
               onClick={handleAddBlankOrder}
-              className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700"
+              disabled={!canAddOrder}
+              className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-50"
             >
               + 新增工單
             </button>
