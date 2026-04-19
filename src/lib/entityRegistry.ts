@@ -15,12 +15,12 @@ export type EntityKind =
   | 'characters';
 
 export const ENTITY_KINDS: readonly EntityKind[] = [
+  'characters',
   'outfits',
   'scenes',
   'poses',
   'expressions',
   'compositions',
-  'characters',
 ] as const;
 
 interface EntityMetadata {

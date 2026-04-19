@@ -4,12 +4,12 @@ import { ENTITY_KINDS, ENTITY_METADATA, type EntityKind } from '@/lib/entityRegi
 describe('entityRegistry', () => {
   it('exports all 6 entity kinds', () => {
     expect(ENTITY_KINDS).toEqual([
+      'characters',
       'outfits',
       'scenes',
       'poses',
       'expressions',
       'compositions',
-      'characters',
     ]);
   });
 
