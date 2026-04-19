@@ -144,6 +144,24 @@ describe('promptAssembler', () => {
       it('Then contains no negative prompt section (zImageTurbo does not use it)', () => {
         expect(result.toLowerCase()).not.toMatch(/^negative:/m);
       });
+
+      it('Then omits face_type / eye / hair_default (encoded by LoRA trigger word)', () => {
+        expect(result).not.toContain('oval face with pointed chin');
+        expect(result).not.toContain('large double-eyelid eyes with dark brown irises');
+        expect(result).not.toContain('black straight shoulder-length hair');
+      });
+
+      it('Then includes character.appearance.body near the subject descriptor', () => {
+        expect(result).toContain('medium build');
+      });
+
+      it('Then places environment (scene) before clothing (outfit) per camera-first order', () => {
+        const sceneIdx = result.indexOf('cozy cafe interior');
+        const outfitIdx = result.indexOf('striped button-up shirt');
+        expect(sceneIdx).toBeGreaterThan(-1);
+        expect(outfitIdx).toBeGreaterThan(-1);
+        expect(sceneIdx).toBeLessThan(outfitIdx);
+      });
     });
   });
 });

@@ -28,12 +28,12 @@ const GLOBAL_CONSTRAINTS =
 function buildSubjectDescription(character: Character): string {
   const [ageFrom] = character.appearance.age_range;
   const ageDesc = `in her early ${ageFrom}s`;
+  // face_type / eye / hair_default are intentionally omitted:
+  // the LoRA trigger_word already encodes them for Z-Image Turbo.
   return [
     character.model.trigger_word,
     `an adult woman ${ageDesc}`,
-    character.appearance.face_type,
-    character.appearance.eye,
-    character.appearance.hair_default,
+    character.appearance.body,
     character.appearance.skin_tone,
   ].join(', ');
 }
@@ -62,12 +62,14 @@ function buildLighting(comp: Composition, scene: Scene): string {
 export function assemblePrompt(args: AssembleArgs): string {
   const { order, comp, character, outfit, scene, pose, expression, tierConstraints } = args;
 
+  // Camera-first order per Z-Image Turbo best practice:
+  // composition → character → environment → clothing → pose/mood → lighting + camera → safety.
   const parts: string[] = [
     comp.prompt,
     buildSubjectDescription(character),
     buildSignatureClause(character),
-    `wearing ${outfit.prompt}`,
     `in ${scene.prompt}`,
+    `wearing ${outfit.prompt}`,
     pose.prompt,
     expression.prompt,
     `${buildLighting(comp, scene)}, ${GLOBAL_QUALITY}`,

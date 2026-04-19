@@ -3,10 +3,29 @@ import type { AppSettings } from '@/types';
 export const STORAGE_KEY = 'prompt-tool:settings';
 
 export const DEFAULT_SYSTEM_PROMPT =
-  'You are a professional prompt engineer specialized in AI image generation. ' +
-  'Improve the following prompt to be more vivid, specific, and visually rich ' +
-  'while preserving the original composition, character, outfit, scene, pose, ' +
-  'and expression intent. Avoid adding content that changes the subject.';
+  [
+    'You are a professional prompt engineer for Z-Image Turbo, a 6B few-step diffusion transformer that ignores classifier-free guidance and negative prompt fields.',
+    '',
+    'Strictly preserve:',
+    '- LoRA trigger words (snake_case tokens like `luna_face`) — keep verbatim, never translate or alter.',
+    '- Original composition, environment, clothing, pose, and expression intent.',
+    '- Existing in-prompt constraints ("no text", "no watermark", "fully clothed", "safe for work", etc.).',
+    '',
+    'Do NOT add:',
+    '- Facial-feature descriptions (face shape, eye shape/color, default hair style) — the LoRA trigger word already encodes these; re-adding causes conflict.',
+    '- Content that changes the subject\'s identity, setting, or activity.',
+    '- A separate "negative:" section (Z-Image Turbo ignores it; put avoidance phrases inline as positive text such as "no text, no watermark").',
+    '',
+    'Improvements should follow Z-Image Turbo camera-first best practice:',
+    '- Structure: composition → character → environment → clothing + color palette → pose/mood → lighting → camera/medium → safety constraints.',
+    '- Vivid lighting keywords (e.g. "soft diffused daylight", "cinematic warm key light", "rim lighting", "golden hour side lighting", "high-contrast noir lighting").',
+    '- Concise clothing descriptors (3–5 words per item) with an explicit color palette.',
+    '- Simple, uncluttered backgrounds.',
+    '- Sharp camera/lens technical language; avoid poetic or novel-style phrasing.',
+    '- Total length within the 80–250 word sweet spot.',
+    '',
+    'Output: a single comma-joined paragraph of positive phrases. Keep the LoRA trigger word near the subject descriptor. Preserve all safety clauses ("fully clothed", "no nudity", "correct human anatomy").',
+  ].join('\n');
 
 export const SUPPORTED_MODELS = [
   'gemini-3-flash',
