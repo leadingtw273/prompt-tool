@@ -22,12 +22,12 @@ beforeEach(() => {
 describe('DataManagerModal', () => {
   it('renders 6 entity rows with display names', () => {
     render(<DataManagerModal open={true} onClose={vi.fn()} />);
-    expect(screen.getByText('Outfits')).toBeInTheDocument();
-    expect(screen.getByText('Scenes')).toBeInTheDocument();
-    expect(screen.getByText('Poses')).toBeInTheDocument();
-    expect(screen.getByText('Expressions')).toBeInTheDocument();
-    expect(screen.getByText('Compositions')).toBeInTheDocument();
-    expect(screen.getByText('Characters')).toBeInTheDocument();
+    expect(screen.getByText('穿搭(Outfits)')).toBeInTheDocument();
+    expect(screen.getByText('場景(Scenes)')).toBeInTheDocument();
+    expect(screen.getByText('姿勢(Poses)')).toBeInTheDocument();
+    expect(screen.getByText('表情(Expressions)')).toBeInTheDocument();
+    expect(screen.getByText('構圖(Compositions)')).toBeInTheDocument();
+    expect(screen.getByText('角色(Characters)')).toBeInTheDocument();
   });
 
   it('shows count 0 when store is empty and disables Export buttons', () => {
@@ -49,8 +49,8 @@ describe('DataManagerModal', () => {
       });
     });
     render(<DataManagerModal open={true} onClose={vi.fn()} />);
-    const outfitsRow = screen.getByText('Outfits').closest('tr')!;
-    const scenesRow = screen.getByText('Scenes').closest('tr')!;
+    const outfitsRow = screen.getByText('穿搭(Outfits)').closest('tr')!;
+    const scenesRow = screen.getByText('場景(Scenes)').closest('tr')!;
     expect(within(outfitsRow).getByText('1')).toBeInTheDocument();
     expect(within(scenesRow).getByText('2')).toBeInTheDocument();
   });
@@ -58,7 +58,7 @@ describe('DataManagerModal', () => {
   it('clicking Import opens ImportEntityModal for that entity', async () => {
     const user = userEvent.setup();
     render(<DataManagerModal open={true} onClose={vi.fn()} />);
-    const outfitsRow = screen.getByText('Outfits').closest('tr')!;
+    const outfitsRow = screen.getByText('穿搭(Outfits)').closest('tr')!;
     const importBtn = within(outfitsRow).getByRole('button', { name: /匯入/ });
     await user.click(importBtn);
     expect(await screen.findByRole('dialog', { name: /匯入\s*Outfits/ })).toBeInTheDocument();
@@ -78,7 +78,7 @@ describe('DataManagerModal', () => {
     });
     const user = userEvent.setup();
     render(<DataManagerModal open={true} onClose={vi.fn()} />);
-    const outfitsRow = screen.getByText('Outfits').closest('tr')!;
+    const outfitsRow = screen.getByText('穿搭(Outfits)').closest('tr')!;
     await user.click(within(outfitsRow).getByRole('button', { name: /匯出/ }));
     expect(createObjectURL).toHaveBeenCalled();
     expect(capturedAnchor!.download).toBe('outfits.csv');

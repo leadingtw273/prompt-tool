@@ -85,7 +85,7 @@ export function DataManagerModal({ open, onClose }: Props) {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs text-slate-400">
-                <th className="py-2">Entity</th>
+                <th className="py-2">資料類型</th>
                 <th className="py-2">筆數</th>
                 <th className="py-2"></th>
                 <th className="py-2"></th>
@@ -97,7 +97,7 @@ export function DataManagerModal({ open, onClose }: Props) {
                 const count = counts[kind];
                 return (
                   <tr key={kind} className="border-t border-slate-800">
-                    <td className="py-2 text-slate-100">{meta.displayName}</td>
+                    <td className="py-2 text-slate-100">{meta.chineseName}({meta.displayName})</td>
                     <td className="py-2 text-slate-300">{count}</td>
                     <td className="py-2">
                       <button

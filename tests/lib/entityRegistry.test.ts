@@ -17,6 +17,7 @@ describe('entityRegistry', () => {
     for (const kind of ENTITY_KINDS) {
       const meta = ENTITY_METADATA[kind];
       expect(meta.displayName).toBeTruthy();
+      expect(meta.chineseName).toBeTruthy();
       expect(meta.hint).toBeTruthy();
       expect(meta.example).toBeTruthy();
       expect(meta.downloadName).toBeTruthy();

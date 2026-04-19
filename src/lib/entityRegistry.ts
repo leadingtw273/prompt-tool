@@ -25,6 +25,7 @@ export const ENTITY_KINDS: readonly EntityKind[] = [
 
 interface EntityMetadata {
   displayName: string;
+  chineseName: string;
   format: 'csv' | 'json';
   hint: string;
   example: string;
@@ -71,6 +72,7 @@ const CHARACTERS_EXAMPLE = JSON.stringify(
 export const ENTITY_METADATA: Record<EntityKind, EntityMetadata> = {
   outfits: {
     displayName: OUTFIT_SCHEMA.displayName,
+    chineseName: '穿搭',
     format: 'csv',
     hint: OUTFIT_SCHEMA.hint,
     example: OUTFIT_SCHEMA.example,
@@ -80,6 +82,7 @@ export const ENTITY_METADATA: Record<EntityKind, EntityMetadata> = {
   },
   scenes: {
     displayName: SCENE_SCHEMA.displayName,
+    chineseName: '場景',
     format: 'csv',
     hint: SCENE_SCHEMA.hint,
     example: SCENE_SCHEMA.example,
@@ -89,6 +92,7 @@ export const ENTITY_METADATA: Record<EntityKind, EntityMetadata> = {
   },
   poses: {
     displayName: POSE_SCHEMA.displayName,
+    chineseName: '姿勢',
     format: 'csv',
     hint: POSE_SCHEMA.hint,
     example: POSE_SCHEMA.example,
@@ -98,6 +102,7 @@ export const ENTITY_METADATA: Record<EntityKind, EntityMetadata> = {
   },
   expressions: {
     displayName: EXPRESSION_SCHEMA.displayName,
+    chineseName: '表情',
     format: 'csv',
     hint: EXPRESSION_SCHEMA.hint,
     example: EXPRESSION_SCHEMA.example,
@@ -107,6 +112,7 @@ export const ENTITY_METADATA: Record<EntityKind, EntityMetadata> = {
   },
   compositions: {
     displayName: COMPOSITION_SCHEMA.displayName,
+    chineseName: '構圖',
     format: 'csv',
     hint: COMPOSITION_SCHEMA.hint,
     example: COMPOSITION_SCHEMA.example,
@@ -116,6 +122,7 @@ export const ENTITY_METADATA: Record<EntityKind, EntityMetadata> = {
   },
   characters: {
     displayName: 'Characters',
+    chineseName: '角色',
     format: 'json',
     hint: CHARACTERS_HINT,
     example: CHARACTERS_EXAMPLE,
