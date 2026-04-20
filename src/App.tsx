@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { AppHeader } from '@/components/AppHeader';
-import { CompPicker } from '@/components/CompPicker';
 import { DataManagerModal } from '@/components/DataManagerModal';
 import { ExportButton } from '@/components/ExportButton';
 import { OrderInput } from '@/components/OrderInput';
@@ -18,12 +17,10 @@ import type { AssembledPrompt, AppSettings } from '@/types';
 
 export default function App() {
   const orders = useOrderStore((state) => state.orders);
-  const compSelections = useOrderStore((state) => state.compSelections);
   const assembledPrompts = useOrderStore((state) => state.assembledPrompts);
   const addOrder = useOrderStore((state) => state.addOrder);
   const updateOrder = useOrderStore((state) => state.updateOrder);
   const removeOrder = useOrderStore((state) => state.removeOrder);
-  const setCompSelection = useOrderStore((state) => state.setCompSelection);
   const setAssembledPrompts = useOrderStore((state) => state.setAssembledPrompts);
 
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -143,20 +140,8 @@ export default function App() {
       pose: poses[0].code,
       expr: expressions[0].code,
       tier: 'T0',
+      selectedCompCodes: [],
     });
-  }
-
-  function handleRecommend() {
-    if (compositions.length === 0) return;
-    setGlobalError(null);
-    setAssembledPrompts([]);
-
-    for (const order of orders) {
-      setCompSelection(order.id, {
-        recommendedCompCodes: compositions.map((composition) => composition.code),
-        selectedCompCodes: [],
-      });
-    }
   }
 
   function handleAssemble() {
@@ -166,12 +151,7 @@ export default function App() {
     const prompts: AssembledPrompt[] = [];
 
     for (const order of orders) {
-      const selection = compSelections[order.id];
-      if (!selection) {
-        continue;
-      }
-
-      for (const compCode of selection.selectedCompCodes) {
+      for (const compCode of order.selectedCompCodes) {
         const composition = compositions.find((item) => item.code === compCode);
         const outfit = outfits.find((item) => item.code === order.outfit);
         const scene = scenes.find((item) => item.code === order.scene);
@@ -246,37 +226,27 @@ export default function App() {
                 新增一筆或多筆工單，再推薦相容的構圖。
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              {hasIncompleteData && (
-                <div className="flex items-center gap-1 text-sm italic text-yellow-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-label="無資料"
-                  >
-                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-                    <path d="M12 9v4" />
-                    <path d="M12 17h.01" />
-                  </svg>
-                  資料不完整將無法新增工單
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={handleAddBlankOrder}
-                disabled={!canAddOrder}
-                className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-50"
-              >
-                + 新增工單
-              </button>
-            </div>
+            {hasIncompleteData && (
+              <div className="flex items-center gap-1 text-sm italic text-yellow-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-label="無資料"
+                >
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                  <path d="M12 9v4" />
+                  <path d="M12 17h.01" />
+                </svg>
+                資料不完整將無法新增工單
+              </div>
+            )}
           </div>
 
           <div className="mt-6 space-y-4">
@@ -286,29 +256,51 @@ export default function App() {
               </div>
             )}
 
-            {orders.map((order, index) => (
-              <div key={order.id} className="relative rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-                <div className="mb-2 text-sm text-slate-400">工單 {index + 1}</div>
-                <OrderInput value={order} onOrderChange={(patch) => updateOrder(order.id, patch)} />
-                <button
-                  type="button"
-                  onClick={() => removeOrder(order.id)}
-                  className="absolute right-4 top-4 text-sm text-red-400 hover:text-red-300"
-                >
-                  移除
-                </button>
-              </div>
-            ))}
+            {orders.map((order, index) => {
+              const pose = poses.find((p) => p.code === order.pose);
+              const recommendedCompCodes = getRecommendedCompCodes(pose, compositions);
+              return (
+                <div key={order.id} className="relative rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                  <div className="mb-2 text-sm text-slate-400">工單 {index + 1}</div>
+                  <OrderInput
+                    value={order}
+                    onOrderChange={(patch) => updateOrder(order.id, patch)}
+                    compositions={compositions}
+                    recommendedCompCodes={recommendedCompCodes}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeOrder(order.id)}
+                    className="absolute right-4 top-4 text-sm text-red-400 hover:text-red-300"
+                  >
+                    移除
+                  </button>
+                </div>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={handleAddBlankOrder}
+              disabled={!canAddOrder}
+              className="w-full rounded border border-dashed border-slate-700 bg-slate-800/50 py-3 text-sm font-medium text-slate-300 hover:border-slate-600 hover:bg-slate-800 hover:text-slate-100 disabled:opacity-50 disabled:hover:border-slate-700 disabled:hover:bg-slate-800/50 disabled:hover:text-slate-300"
+            >
+              + 新增工單
+            </button>
           </div>
 
           <div className="mt-6 flex items-center gap-3">
             <button
               type="button"
-              onClick={handleRecommend}
-              disabled={orders.length === 0 || compositions.length === 0}
-              className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+              onClick={handleAssemble}
+              disabled={
+                orders.length === 0 ||
+                compositions.length === 0 ||
+                orders.every((order) => order.selectedCompCodes.length === 0)
+              }
+              className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600"
             >
-              推薦構圖
+              組裝提示詞
             </button>
 
             {globalError && (
@@ -318,61 +310,6 @@ export default function App() {
             )}
           </div>
         </section>
-
-        {Object.keys(compSelections).length > 0 && (
-          <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-100">構圖挑選</h2>
-                <p className="text-sm text-slate-400">
-                  取消勾選不想組裝的構圖。
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleAssemble}
-                disabled={Object.values(compSelections).every(
-                  (selection) => selection.selectedCompCodes.length === 0,
-                )}
-                className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600"
-              >
-                組裝提示詞
-              </button>
-            </div>
-
-            <div className="mt-6 space-y-6">
-              {orders.map((order, index) => {
-                const selection = compSelections[order.id];
-                if (!selection) {
-                  return null;
-                }
-
-                const recommended = compositions.filter((composition) =>
-                  selection.recommendedCompCodes.includes(composition.code),
-                );
-                const pose = poses.find((p) => p.code === order.pose);
-                const recommendedCodes = getRecommendedCompCodes(pose, compositions);
-
-                return (
-                  <div key={order.id} className="space-y-3">
-                    <h3 className="text-sm font-semibold text-slate-300">工單 {index + 1}</h3>
-                    <CompPicker
-                      options={recommended}
-                      recommendedCodes={recommendedCodes}
-                      selected={selection.selectedCompCodes}
-                      onChange={(codes) =>
-                        setCompSelection(order.id, {
-                          recommendedCompCodes: selection.recommendedCompCodes,
-                          selectedCompCodes: codes,
-                        })
-                      }
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
 
         {assembledPrompts.length > 0 && (
           <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-lg shadow-black/30">
