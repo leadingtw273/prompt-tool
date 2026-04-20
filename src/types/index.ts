@@ -88,12 +88,7 @@ export interface Order {
   pose: string;
   expr: string;
   tier: Tier;
-}
-
-export interface CompSelection {
-  orderId: string;
   selectedCompCodes: string[];
-  recommendedCompCodes: string[];
 }
 
 export interface OptimizedPrompt {

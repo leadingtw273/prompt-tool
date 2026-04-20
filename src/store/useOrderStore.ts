@@ -1,10 +1,9 @@
 import { create } from 'zustand';
-import type { AssembledPrompt, CompSelection, OptimizedPrompt, Order } from '@/types';
+import type { AssembledPrompt, OptimizedPrompt, Order } from '@/types';
 
 interface OrderStoreState {
   characterId: 'ACC-001';
   orders: Order[];
-  compSelections: Record<string, CompSelection>;
   assembledPrompts: AssembledPrompt[];
 }
 
@@ -12,8 +11,6 @@ interface OrderStoreActions {
   addOrder: (order: Omit<Order, 'id'>) => string;
   updateOrder: (id: string, patch: Partial<Omit<Order, 'id'>>) => void;
   removeOrder: (id: string) => void;
-  setCompSelection: (orderId: string, payload: Omit<CompSelection, 'orderId'>) => void;
-  toggleComp: (orderId: string, compCode: string) => void;
   setAssembledPrompts: (prompts: AssembledPrompt[]) => void;
   setOptimizing: (orderId: string, compCode: string, optimizing: boolean) => void;
   setOptimizingLanguage: (
@@ -35,7 +32,6 @@ interface OrderStoreActions {
 const initialState: OrderStoreState = {
   characterId: 'ACC-001',
   orders: [],
-  compSelections: {},
   assembledPrompts: [],
 };
 
@@ -59,40 +55,9 @@ export const useOrderStore = create<OrderStoreState & OrderStoreActions>((set) =
   },
 
   removeOrder: (id) => {
-    set((s) => {
-      const { [id]: _removed, ...rest } = s.compSelections;
-      return {
-        orders: s.orders.filter((o) => o.id !== id),
-        compSelections: rest,
-      };
-    });
-  },
-
-  setCompSelection: (orderId, payload) => {
     set((s) => ({
-      compSelections: {
-        ...s.compSelections,
-        [orderId]: { orderId, ...payload },
-      },
+      orders: s.orders.filter((o) => o.id !== id),
     }));
-  },
-
-  toggleComp: (orderId, compCode) => {
-    set((s) => {
-      const current = s.compSelections[orderId];
-      if (!current) {
-        return s;
-      }
-      const selected = current.selectedCompCodes.includes(compCode)
-        ? current.selectedCompCodes.filter((c) => c !== compCode)
-        : [...current.selectedCompCodes, compCode];
-      return {
-        compSelections: {
-          ...s.compSelections,
-          [orderId]: { ...current, selectedCompCodes: selected },
-        },
-      };
-    });
   },
 
   setAssembledPrompts: (prompts) => set({ assembledPrompts: prompts }),

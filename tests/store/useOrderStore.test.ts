@@ -9,7 +9,7 @@ describe('useOrderStore', () => {
 
   describe('Given an empty store', () => {
     describe('When addOrder is called with a new order', () => {
-      it('Then orders list length becomes 1 and the order gets an id', () => {
+      it('Then orders list length becomes 1 and the order gets an id and empty selectedCompCodes', () => {
         const { result } = renderHook(() => useOrderStore());
         act(() => {
           result.current.addOrder({
@@ -18,10 +18,12 @@ describe('useOrderStore', () => {
             pose: 'POS-04',
             expr: 'EXP-01',
             tier: 'T0',
+            selectedCompCodes: [],
           });
         });
         expect(result.current.orders).toHaveLength(1);
         expect(result.current.orders[0].id).toBeTruthy();
+        expect(result.current.orders[0].selectedCompCodes).toEqual([]);
       });
     });
   });
@@ -38,6 +40,7 @@ describe('useOrderStore', () => {
             pose: 'POS-04',
             expr: 'EXP-01',
             tier: 'T0',
+            selectedCompCodes: [],
           });
         });
         act(() => {
@@ -47,8 +50,8 @@ describe('useOrderStore', () => {
       });
     });
 
-    describe('When setCompSelection provides a recommended list', () => {
-      it('Then both recommended and selected lists are stored', () => {
+    describe('When updateOrder patches selectedCompCodes', () => {
+      it('Then the order selectedCompCodes is replaced by the patch value', () => {
         const { result } = renderHook(() => useOrderStore());
         let id = '';
         act(() => {
@@ -58,40 +61,36 @@ describe('useOrderStore', () => {
             pose: 'POS-04',
             expr: 'EXP-01',
             tier: 'T0',
+            selectedCompCodes: [],
           });
         });
         act(() => {
-          result.current.setCompSelection(id, {
-            recommendedCompCodes: ['COMP-01', 'COMP-03', 'COMP-04'],
-            selectedCompCodes: ['COMP-01', 'COMP-03', 'COMP-04'],
-          });
-        });
-        expect(result.current.compSelections[id].recommendedCompCodes).toHaveLength(3);
-        expect(result.current.compSelections[id].selectedCompCodes).toHaveLength(3);
-      });
-    });
-
-    describe('When toggleComp removes a selected comp', () => {
-      it('Then selectedCompCodes no longer includes that code', () => {
-        const { result } = renderHook(() => useOrderStore());
-        let id = '';
-        act(() => {
-          id = result.current.addOrder({
-            outfit: 'CAS-02',
-            scene: 'SCN-01',
-            pose: 'POS-04',
-            expr: 'EXP-01',
-            tier: 'T0',
-          });
-          result.current.setCompSelection(id, {
-            recommendedCompCodes: ['COMP-01', 'COMP-03'],
+          result.current.updateOrder(id, {
             selectedCompCodes: ['COMP-01', 'COMP-03'],
           });
         });
+        expect(result.current.orders[0].selectedCompCodes).toEqual(['COMP-01', 'COMP-03']);
+      });
+    });
+
+    describe('When removeOrder is called for an order with selections', () => {
+      it('Then the order is removed from the list', () => {
+        const { result } = renderHook(() => useOrderStore());
+        let id = '';
         act(() => {
-          result.current.toggleComp(id, 'COMP-01');
+          id = result.current.addOrder({
+            outfit: 'CAS-02',
+            scene: 'SCN-01',
+            pose: 'POS-04',
+            expr: 'EXP-01',
+            tier: 'T0',
+            selectedCompCodes: ['COMP-01', 'COMP-02'],
+          });
         });
-        expect(result.current.compSelections[id].selectedCompCodes).toEqual(['COMP-03']);
+        act(() => {
+          result.current.removeOrder(id);
+        });
+        expect(result.current.orders).toHaveLength(0);
       });
     });
   });
