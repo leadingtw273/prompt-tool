@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { OrderInput } from '@/components/OrderInput';
 import { useDataStore } from '@/store/useDataStore';
-import type { Order, Outfit, Scene, Pose, Expression } from '@/types';
+import type { Order, Outfit, Scene, Pose, Expression, Composition } from '@/types';
 
 const MOCK_OUTFITS: Outfit[] = [
   { code: 'CAS-01', name: 'Casual 01', prompt: 'casual outfit 01' },
@@ -23,6 +23,27 @@ const MOCK_EXPRESSIONS: Expression[] = [
   { code: 'EXP-01', name: 'Expr 01', prompt: 'expr 01' },
   { code: 'EXP-05', name: 'Expr 05', prompt: 'expr 05' },
 ];
+const MOCK_COMPOSITIONS: Composition[] = [
+  {
+    code: 'COMP-01',
+    name: '特寫正面',
+    prompt: 'close-up headshot, front view',
+    shot: 'close_up',
+    angle: 'front',
+  },
+  {
+    code: 'COMP-04',
+    name: '全身 3/4',
+    prompt: 'full-body shot, 3/4 angle',
+    shot: 'full_body',
+    angle: 'three_quarter',
+  },
+];
+
+const DEFAULT_COMP_PROPS = {
+  compositions: MOCK_COMPOSITIONS,
+  recommendedCompCodes: [] as string[],
+};
 
 describe('OrderInput', () => {
   beforeEach(() => {
@@ -48,7 +69,7 @@ describe('OrderInput', () => {
       it('Then onOrderChange is called with a parsed Order', async () => {
         const user = userEvent.setup();
         const onOrderChange = vi.fn();
-        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+        render(<OrderInput value={null} onOrderChange={onOrderChange} {...DEFAULT_COMP_PROPS} />);
 
         const input = screen.getByLabelText('四項代碼組合');
         await user.click(input);
@@ -65,7 +86,7 @@ describe('OrderInput', () => {
     describe('When invalid codes are entered', () => {
       it('Then an error message is displayed', async () => {
         const user = userEvent.setup();
-        render(<OrderInput value={null} onOrderChange={vi.fn()} />);
+        render(<OrderInput value={null} onOrderChange={vi.fn()} {...DEFAULT_COMP_PROPS} />);
         const input = screen.getByLabelText('四項代碼組合');
         await user.click(input);
         await user.clear(input);
@@ -77,7 +98,7 @@ describe('OrderInput', () => {
       it('keeps invalid input visible after blur so the user can correct it', async () => {
         const user = userEvent.setup();
         const onOrderChange = vi.fn();
-        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+        render(<OrderInput value={null} onOrderChange={onOrderChange} {...DEFAULT_COMP_PROPS} />);
 
         const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
         await user.click(input);
@@ -92,7 +113,7 @@ describe('OrderInput', () => {
       it('keeps the error visible when a select field is changed while the draft is still invalid', async () => {
         const user = userEvent.setup();
         const onOrderChange = vi.fn();
-        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+        render(<OrderInput value={null} onOrderChange={onOrderChange} {...DEFAULT_COMP_PROPS} />);
 
         const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
         await user.click(input);
@@ -116,7 +137,7 @@ describe('OrderInput', () => {
       it('preserves invalid input on re-focus after a failed blur', async () => {
         const user = userEvent.setup();
         const onOrderChange = vi.fn();
-        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+        render(<OrderInput value={null} onOrderChange={onOrderChange} {...DEFAULT_COMP_PROPS} />);
 
         const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
         await user.click(input);
@@ -134,7 +155,7 @@ describe('OrderInput', () => {
       it('silently reverts to the derived codes when the input is cleared and blurred', async () => {
         const user = userEvent.setup();
         const onOrderChange = vi.fn();
-        render(<OrderInput value={null} onOrderChange={onOrderChange} />);
+        render(<OrderInput value={null} onOrderChange={onOrderChange} {...DEFAULT_COMP_PROPS} />);
 
         const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
         const initialValue = input.value;
@@ -158,8 +179,9 @@ describe('OrderInput', () => {
           pose: 'POS-04',
           expr: 'EXP-05',
           tier: 'T0' as const,
+          selectedCompCodes: [] as string[],
         };
-        render(<OrderInput value={value} onOrderChange={onOrderChange} />);
+        render(<OrderInput value={value} onOrderChange={onOrderChange} {...DEFAULT_COMP_PROPS} />);
 
         const input = screen.getByLabelText('四項代碼組合') as HTMLInputElement;
         await user.click(input);
@@ -171,12 +193,56 @@ describe('OrderInput', () => {
 
     describe('The unified view', () => {
       it('Then all select inputs are rendered', () => {
-        render(<OrderInput value={null} onOrderChange={vi.fn()} />);
+        render(<OrderInput value={null} onOrderChange={vi.fn()} {...DEFAULT_COMP_PROPS} />);
         expect(screen.getByLabelText('服裝')).toBeInTheDocument();
         expect(screen.getByLabelText('場景')).toBeInTheDocument();
         expect(screen.getByLabelText('姿勢')).toBeInTheDocument();
         expect(screen.getByLabelText('表情')).toBeInTheDocument();
         expect(screen.getByLabelText('分級')).toBeInTheDocument();
+      });
+    });
+
+    describe('Composition picker integration', () => {
+      it('renders the CompPicker with the provided compositions', () => {
+        render(
+          <OrderInput
+            value={null}
+            onOrderChange={vi.fn()}
+            compositions={MOCK_COMPOSITIONS}
+            recommendedCompCodes={[]}
+          />,
+        );
+        expect(screen.getByLabelText('構圖挑選')).toBeInTheDocument();
+      });
+
+      it('fires onOrderChange with updated selectedCompCodes when a comp is picked', async () => {
+        const user = userEvent.setup();
+        const onOrderChange = vi.fn();
+        const value = {
+          outfit: 'CAS-02',
+          scene: 'SCN-01',
+          pose: 'POS-04',
+          expr: 'EXP-01',
+          tier: 'T0' as const,
+          selectedCompCodes: [] as string[],
+        };
+        render(
+          <OrderInput
+            value={value}
+            onOrderChange={onOrderChange}
+            compositions={MOCK_COMPOSITIONS}
+            recommendedCompCodes={['COMP-04']}
+          />,
+        );
+
+        await user.click(screen.getByLabelText('構圖挑選'));
+        await user.click(await screen.findByText('特寫正面'));
+
+        expect(onOrderChange).toHaveBeenCalled();
+        const lastArg = onOrderChange.mock.calls.at(-1)?.[0] as Order;
+        expect(lastArg.selectedCompCodes).toEqual(['COMP-01']);
+        expect(lastArg.outfit).toBe('CAS-02');
+        expect(lastArg.tier).toBe('T0');
       });
     });
   });

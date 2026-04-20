@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import type { FocusEvent } from 'react';
+import { CompPicker } from '@/components/CompPicker';
 import { parseCodes } from '@/lib/orderParser';
 import { useDataStore } from '@/store/useDataStore';
-import type { Order, Tier } from '@/types';
+import type { Composition, Order, Tier } from '@/types';
 
 interface Props {
   value: Omit<Order, 'id'> | null;
   onOrderChange: (order: Omit<Order, 'id'>) => void;
+  compositions: Composition[];
+  recommendedCompCodes: string[];
 }
 
 const TIER_OPTIONS: { code: Tier; label: string }[] = [
@@ -20,7 +23,7 @@ function formatCodes(o: Pick<Omit<Order, 'id'>, 'outfit' | 'scene' | 'pose' | 'e
   return `${o.outfit}_${o.scene}_${o.pose}_${o.expr}`;
 }
 
-export function OrderInput({ value, onOrderChange }: Props) {
+export function OrderInput({ value, onOrderChange, compositions, recommendedCompCodes }: Props) {
   const outfits = useDataStore((s) => s.outfits);
   const scenes = useDataStore((s) => s.scenes);
   const poses = useDataStore((s) => s.poses);
@@ -32,6 +35,7 @@ export function OrderInput({ value, onOrderChange }: Props) {
     pose: value?.pose ?? poses[0]?.code ?? '',
     expr: value?.expr ?? expressions[0]?.code ?? '',
     tier: value?.tier ?? ('T0' as Tier),
+    selectedCompCodes: value?.selectedCompCodes ?? [],
   };
 
   // codesText 僅在 input 處於 focus 期間使用 local buffer；
@@ -131,13 +135,26 @@ export function OrderInput({ value, onOrderChange }: Props) {
 
       <div aria-hidden="true" className="my-6 border-t border-slate-700" />
 
-      <SelectField
-        id="tier"
-        label="分級"
-        value={current.tier}
-        options={TIER_OPTIONS.map((t) => ({ code: t.code, name: t.label, label: t.label }))}
-        onChange={(v) => handleFieldChange({ tier: v as Tier })}
-      />
+      <div className="grid grid-cols-2 gap-3">
+        <SelectField
+          id="tier"
+          label="分級"
+          value={current.tier}
+          options={TIER_OPTIONS.map((t) => ({ code: t.code, name: t.label, label: t.label }))}
+          onChange={(v) => handleFieldChange({ tier: v as Tier })}
+        />
+        <div>
+          <label className="block text-sm font-medium text-slate-200">構圖</label>
+          <div className="mt-1">
+            <CompPicker
+              options={compositions}
+              recommendedCodes={recommendedCompCodes}
+              selected={current.selectedCompCodes}
+              onChange={(selectedCompCodes) => handleFieldChange({ selectedCompCodes })}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
